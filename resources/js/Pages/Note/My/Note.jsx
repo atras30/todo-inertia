@@ -2,7 +2,6 @@ import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
 import AnonymousAvatar from "@/Components/icons/AnonymousAvatar";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import GuestLayout from "@/Layouts/GuestLayout";
 import axiosInstance from "@/Service/Axios/AxiosInstance";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
@@ -26,7 +25,7 @@ export default function Note({ auth }) {
 
         const response = await axiosInstance
             .get(
-                route("notes.public.paginate", {
+                route("notes.my.paginate", {
                     currentPage: currentPage,
                 })
             )
@@ -37,6 +36,8 @@ export default function Note({ auth }) {
                 setIsFetchingData(false);
             });
 
+        console.log(response.data);
+
         setNotes((prev) => [...prev, ...response.data.data]);
     }
 
@@ -46,30 +47,23 @@ export default function Note({ auth }) {
                 key={note?.id}
                 className="p-5 overflow-hidden bg-white border rounded-lg shadow"
             >
-                <div className="flex justify-between gap-2">
+                <div className="flex justify-between">
                     <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <p className="font-bold underline decoration-solid">
-                                {note?.title}
-                            </p>
-                            <p className="text-xs text-slate-500">|</p>
-                            <p className="text-xs text-slate-500">
-                                {note?.visibility} Note
-                            </p>
-                        </div>
+                        <p className="mb-2 font-bold underline decoration-solid">
+                            {note?.title}
+                        </p>
 
                         <div className="break-all">{note?.body || "-"}</div>
                     </div>
                     <div className="me-2 mt-auto mb-auto text-sm font-medium text-end text-slate-400 min-w-[4rem]">
                         <span className="flex items-center justify-center gap-2 ml-2">
-                            <AnonymousAvatar className="w-7 h-7" />
-
+                            <AnonymousAvatar className="w-6 h-6" />
                             {note?.user !== null
                                 ? note?.user?.name || "-"
                                 : "Anonymous"}
                         </span>
 
-                        <div className="my-2 border-b-2 border-blue-400" />
+                        <div className="my-2 border-b-2 border-gray-300" />
 
                         <div>
                             {format(new Date(note?.created_at), "dd MMMM yyyy")}
@@ -101,7 +95,7 @@ export default function Note({ auth }) {
             <div className="flex justify-between">
                 <div className="flex items-center justify-center">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800 align-middle">
-                        Public Notes
+                        My Notes
                     </h2>
                 </div>
 
@@ -111,7 +105,7 @@ export default function Note({ auth }) {
     }
 
     return (
-        <GuestLayout header={<Header />}>
+        <AuthenticatedLayout user={auth.user} header={<Header />}>
             <Head title="Notes" />
 
             <div className="py-6">
@@ -135,6 +129,6 @@ export default function Note({ auth }) {
                     </div>
                 </div>
             </div>
-        </GuestLayout>
+        </AuthenticatedLayout>
     );
 }

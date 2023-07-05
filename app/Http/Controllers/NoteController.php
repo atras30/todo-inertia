@@ -10,18 +10,45 @@ use Inertia\Inertia;
 
 class NoteController extends Controller
 {
-    public function index()
+    // GET
+    public function showPublicNotes()
     {
         return Inertia::render('Note/Note');
     }
 
+    public function myNotes()
+    {
+        return Inertia::render('Note/My/Note');
+    }
+
+    public function showCreatNoteForm()
+    {
+        return Inertia::render("Note/Form/AddNote");
+    }
+
+    // POST
+    public function create(CreateNoteRequest $request)
+    {
+        if ($request->title === null) $request['title'] = "";
+        $note = Note::create([
+            "title" => $request->title,
+            "body" => $request->body,
+            "visibility" => $request->visibility,
+            "user_id" => $request->user_id
+        ]);
+
+        return redirect()->route("notes.public");
+    }
+
+    // PAGINATION
+
     public function paginateNotes(Request $request)
     {
         //Define the pagination limit
-        $paginationLimit = 5;
+        $paginationLimit = 20;
 
         // Define the query and filter
-        $notesQuery = Note::select('title', 'body', 'id', 'created_at')->orderBy('created_at', 'desc');
+        $notesQuery = Note::where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
 
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
@@ -41,19 +68,29 @@ class NoteController extends Controller
         return response()->json($pagination, Response::HTTP_OK);
     }
 
-    public function showCreatNoteForm()
+    public function paginatePublicNotes(Request $request)
     {
-        return Inertia::render("Note/Form/AddNote");
-    }
+        //Define the pagination limit
+        $paginationLimit = 20;
 
-    public function create(CreateNoteRequest $request)
-    {
-        if ($request->title === null) $request['title'] = "";
-        $note = Note::create([
-            "title" => $request->title,
-            "body" => $request->body
-        ]);
+        // Define the query and filter
+        $notesQuery = Note::where("visibility", "public")->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
 
-        return redirect()->route("notes");
+        // Get total data of the filtered query
+        $totalData = $notesQuery->count();
+        // Set offset and limit
+        $notesQuery = $notesQuery->offset($paginationLimit * ($request->currentPage - 1))->limit($paginationLimit);
+        // Get data
+        $data = $notesQuery->get();
+        // Total data length
+        $count = $data->count();
+
+        $pagination = [
+            "totalData" => $totalData,
+            "count" => $count,
+            "data" => $data,
+        ];
+
+        return response()->json($pagination, Response::HTTP_OK);
     }
 }

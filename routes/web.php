@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -19,19 +18,23 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return to_route("notes.public");
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
-Route::get('/notes', [NoteController::class, 'index'])->name('notes');
-Route::get('/notes/paginate', [NoteController::class, 'paginateNotes'])->name('notes.paginate');
-Route::get('/notes/create', [NoteController::class, 'showCreatNoteForm'])->name('notes.form');
-Route::post('/notes/create', [NoteController::class, 'create'])->name('notes.create');
+// Notes
+Route::prefix("notes")->group(function() {
+    // Public
+    Route::get('/', [NoteController::class, 'showPublicNotes'])->name('notes.public');
+    Route::get('/public/paginate', [NoteController::class, 'paginatePublicNotes'])->name('notes.public.paginate');
+    Route::get('/form', [NoteController::class, 'showCreatNoteForm'])->name('notes.form');
+
+    // My
+    Route::get('/my', [NoteController::class, 'myNotes'])->middleware(['auth', 'verified'])->name('notes.my');
+    Route::get('/my/paginate', [NoteController::class, 'paginateNotes'])->name('notes.my.paginate');
+
+    // Create
+    Route::post('/create', [NoteController::class, 'create'])->name('notes.create');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->text("title");
             $table->text("body");
-            $table->boolean("is_done")->default(false);
             $table->enum('visibility', ['public', 'private', 'unlisted']);
             $table->foreignId('user_id')
                 ->nullable()
