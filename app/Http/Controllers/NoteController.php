@@ -30,14 +30,21 @@ class NoteController extends Controller
     public function create(CreateNoteRequest $request)
     {
         if ($request->title === null) $request['title'] = "";
-        $note = Note::create([
-            "title" => $request->title,
-            "body" => $request->body,
-            "visibility" => $request->visibility,
-            "user_id" => $request->user_id
-        ]);
 
-        return redirect()->route("notes.public");
+        try {
+            $note = Note::create([
+                "title" => $request->title,
+                "body" => $request->body,
+                "visibility" => $request->visibility,
+                "user_id" => $request->user_id
+            ]);
+        } catch(\Exception $e) {
+            return response()->json($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            "message" => "A new note created!"
+        ], Response::HTTP_CREATED);
     }
 
     // PAGINATION

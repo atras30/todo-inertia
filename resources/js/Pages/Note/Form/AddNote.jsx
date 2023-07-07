@@ -4,10 +4,13 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import GuestLayout from "@/Layouts/GuestLayout";
+import { ToastContext } from "@/Provider/Toast/ToastProvider";
+import axiosInstance from "@/Provider/Axios/AxiosProvider";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { format } from "date-fns";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import Select from "react-select";
+import { router } from "@inertiajs/react";
 
 export default function Dashboard({ auth }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -16,6 +19,8 @@ export default function Dashboard({ auth }) {
         visibility: "public",
         user_id: auth?.user?.id ?? null,
     });
+
+    const toast = useContext(ToastContext);
 
     const visibilityList = [
         { value: "public", label: "Public" },
@@ -27,10 +32,14 @@ export default function Dashboard({ auth }) {
         // Do Something
     }, []);
 
-    const submit = (e) => {
+    const submit = async (e) => {
         e.preventDefault();
 
-        post(route("notes.create"));
+        const response = await axiosInstance
+            .post(route("notes.create"), data)
+
+        toast.success(response?.data?.message);
+        router.get(route("notes.public"));
     };
 
     function Header() {

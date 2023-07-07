@@ -1,20 +1,24 @@
 import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
-import AnonymousAvatar from "@/Components/icons/AnonymousAvatar";
+import Toast, { ToastContext } from "@/Provider/Toast/ToastProvider";
+import AnonymousAvatar from "@/Components/Icons/AnonymousAvatar";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import GuestLayout from "@/Layouts/GuestLayout";
-import axiosInstance from "@/Service/Axios/AxiosInstance";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 
-export default function Note({ auth }) {
+export default function Note() {
     // Main State
     const [notes, setNotes] = useState([]);
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     // Loading State
     const [isFetchingData, setIsFetchingData] = useState(false);
+
+    const toast = useContext(ToastContext);
+    const axiosInstance = useContext(AxiosContext);
 
     useEffect(() => {
         fetchNotes(currentPage);
@@ -30,14 +34,11 @@ export default function Note({ auth }) {
                     currentPage: currentPage,
                 })
             )
-            .catch((error) => {
-                return;
-            })
             .finally(() => {
                 setIsFetchingData(false);
             });
 
-        setNotes((prev) => [...prev, ...response.data.data]);
+        setNotes((prev) => [...prev, ...response?.data?.data]);
     }
 
     function _renderNotes() {

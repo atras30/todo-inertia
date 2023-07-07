@@ -1,8 +1,8 @@
 import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
-import AnonymousAvatar from "@/Components/icons/AnonymousAvatar";
+import AnonymousAvatar from "@/Components/Icons/AnonymousAvatar";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import axiosInstance from "@/Service/Axios/AxiosInstance";
+import axiosInstance from "@/Provider/Axios/AxiosProvider";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
