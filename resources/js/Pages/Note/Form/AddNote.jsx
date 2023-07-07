@@ -2,15 +2,13 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { ToastContext } from "@/Provider/Toast/ToastProvider";
-import axiosInstance from "@/Provider/Axios/AxiosProvider";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { format } from "date-fns";
-import { Fragment, useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import Select from "react-select";
 import { router } from "@inertiajs/react";
+import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 
 export default function Dashboard({ auth }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -21,12 +19,16 @@ export default function Dashboard({ auth }) {
     });
 
     const toast = useContext(ToastContext);
+    const axiosInstance = useContext(AxiosContext);
 
-    const visibilityList = [
+    const visibilityAnonymousList = [{ value: "public", label: "Public" }];
+    const visibilityAuthenticatedUserList = [
         { value: "public", label: "Public" },
         { value: "private", label: "Private" },
         { value: "unlisted", label: "Unlisted" },
     ];
+    let visibilityList = visibilityAnonymousList;
+    if(auth.user !== null) visibilityList = visibilityAuthenticatedUserList;
 
     useEffect(() => {
         // Do Something
@@ -35,8 +37,7 @@ export default function Dashboard({ auth }) {
     const submit = async (e) => {
         e.preventDefault();
 
-        const response = await axiosInstance
-            .post(route("notes.create"), data)
+        const response = await axiosInstance.post(route("notes.create"), data);
 
         toast.success(response?.data?.message);
         router.get(route("notes.public"));
