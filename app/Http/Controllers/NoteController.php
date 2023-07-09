@@ -22,7 +22,7 @@ class NoteController extends Controller
         return Inertia::render('Note/My/Note');
     }
 
-    public function showCreatNoteForm()
+    public function showCreateNoteForm()
     {
         return Inertia::render("Note/Form/AddNote");
     }
@@ -39,7 +39,7 @@ class NoteController extends Controller
                 "visibility" => $request->visibility,
                 "user_id" => $request->user_id
             ]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -49,8 +49,27 @@ class NoteController extends Controller
     }
 
     // DELETE
-    public function delete(DeleteNoteRequest $request) {
-        dd($request->all());
+    public function delete(Request $request, $id)
+    {
+        if ($id == null)
+            return $this->throwInternalServerError("Id must be filled.");
+
+        try {
+            Note::destroy($id);
+        } catch (\Exception $e) {
+            $this->throwInternalServerError($e->getMessage());
+        }
+
+        return response()->json([
+            "message" => "Successfully deleted a note."
+        ], Response::HTTP_OK);
+    }
+
+    public function throwInternalServerError($message)
+    {
+        return response()->json([
+            "message" => $message
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     // PAGINATION

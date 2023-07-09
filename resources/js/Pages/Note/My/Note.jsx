@@ -6,6 +6,8 @@ import axiosInstance, { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
 import { Fragment, useContext, useEffect, useState } from "react";
+import _renderIcons from "@/Components/icons/IconRenderer";
+import { ToastContext } from "@/Provider/Toast/ToastProvider";
 
 export default function Note({ auth }) {
     // Main State
@@ -20,25 +22,32 @@ export default function Note({ auth }) {
 
     // Context
     const axiosInstance = useContext(AxiosContext);
+    const toast = useContext(ToastContext);
 
     useEffect(() => {
         fetchNotes(currentPage);
     }, []);
 
-    async function fetchNotes(currentPage) {
+    async function fetchNotes(
+        currentPage,
+        keepPage = false,
+        replaceAll = false
+    ) {
         setIsFetchingData(true);
-        setCurrentPage(currentPage + 1);
+
+        if (!keepPage) setCurrentPage(currentPage + 1);
 
         const response = await axiosInstance
             .get(
                 route("notes.my.paginate", {
-                    currentPage: currentPage,
+                    currentPage: keepPage ? currentPage - 1 : currentPage,
                 })
             )
             .finally(() => {
                 setIsFetchingData(false);
             });
 
+        if (replaceAll) return setNotes(response?.data?.data);
         setNotes((prev) => [...prev, ...response?.data?.data]);
     }
 
@@ -54,10 +63,10 @@ export default function Note({ auth }) {
                             {note?.title}
                         </p>
 
-                        <div className="break-all">{note?.body || "-"}</div>
+                        <pre className="break-all">{note?.body || "-"}</pre>
                     </div>
-                    <div className="me-2 mt-auto mb-auto text-sm font-medium text-end text-slate-400 min-w-[4rem]">
-                        <span className="flex items-center justify-center gap-2 ml-2">
+                    <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
+                        <span className="flex items-start justify-center gap-2 ml-2">
                             <AnonymousAvatar className="w-6 h-6" />
                             {note?.user !== null
                                 ? note?.user?.name || "-"
@@ -79,8 +88,8 @@ export default function Note({ auth }) {
                         </div>
 
                         <div
-                            className="w-8 h-8 mt-2 ml-auto cursor-pointer"
-                            onClick={() => setShowDeleteModal(true)}
+                            className="w-6 h-6 mt-2 ml-auto cursor-pointer"
+                            onClick={() => handleDeleteNote(note?.id)}
                         >
                             <svg
                                 className="w-full h-full"
@@ -154,20 +163,39 @@ export default function Note({ auth }) {
         );
     }
 
+    async function handleDeleteNote(id) {
+        const response = await axiosInstance.delete(
+            route("notes.delete", {
+                id: id,
+            })
+        );
+
+        toast.success(response?.data?.message);
+        fetchNotes(currentPage, true, true);
+    }
+
     function Header() {
         return (
             <div className="flex justify-between">
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-between ">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800 align-middle">
                         My Notes
                     </h2>
                 </div>
+                <PrimaryButton className="flex items-center gap-2 text-xl font-semibold leading-tight text-gray-800 align-middle">
+                    <span>{_renderIcons("recycle-bin")}</span>
+                    Recycle Bin
+                </PrimaryButton>
             </div>
         );
     }
 
     return (
-        <MasterLayout className={"p-4 max-w-6xl mx-auto"} user={auth.user} header={<Header />}>
+        <MasterLayout
+            className={"p-4 max-w-6xl mx-auto"}
+            user={auth.user}
+            header={<Header />}
+        >
             <Head title="Notes" />
 
             <div className="space-y-3">

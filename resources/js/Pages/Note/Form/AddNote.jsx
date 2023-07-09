@@ -28,7 +28,7 @@ export default function Dashboard({ auth }) {
         { value: "unlisted", label: "Unlisted" },
     ];
     let visibilityList = visibilityAnonymousList;
-    if(auth.user !== null) visibilityList = visibilityAuthenticatedUserList;
+    if (auth.user !== null) visibilityList = visibilityAuthenticatedUserList;
 
     useEffect(() => {
         // Do Something
@@ -59,7 +59,7 @@ export default function Dashboard({ auth }) {
         <MasterLayout className={"p-2"} user={auth.user} header={<Header />}>
             <Head title="Create New Note" />
 
-            <div className="space-y-3">
+            <div className="max-w-6xl mx-auto space-y-3">
                 <form onSubmit={submit}>
                     <div className="mb-2">
                         <InputLabel htmlFor="title" value="title" />
@@ -83,11 +83,12 @@ export default function Dashboard({ auth }) {
                             required={true}
                         />
 
-                        <TextInput
+                        <textarea
                             id="body"
+                            rows={5}
+                            className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             name="body"
                             value={data.body}
-                            className="block w-full mt-1"
                             onChange={(e) => setData("body", e.target.value)}
                             required
                         />

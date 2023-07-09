@@ -60,10 +60,10 @@ export default function Note({ auth }) {
                             </p>
                         </div>
 
-                        <div className="break-all">{note?.body || "-"}</div>
+                        <pre className="break-all">{note?.body || "-"}</pre>
                     </div>
-                    <div className="me-2 mt-auto mb-auto text-sm font-medium text-end text-slate-400 min-w-[4rem]">
-                        <span className="flex items-center justify-center gap-2 ml-2">
+                    <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
+                        <span className="flex items-start justify-center gap-2 ml-2">
                             <AnonymousAvatar className="w-7 h-7" />
 
                             {note?.user !== null
