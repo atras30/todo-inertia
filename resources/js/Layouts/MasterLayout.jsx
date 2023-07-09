@@ -1,11 +1,11 @@
+import ButtonWithRippleEffect from "@/Components/Common/Buttons/ButtonWithRippleEffect";
 import NavigationBar from "@/Components/Common/NavigationBar/NavigationBar";
 
-export default function MasterLayout({ user, header, children }) {
-    console.log(user);
 
+export default function MasterLayout({ user, header, children, className }) {
     return (
         <div className="relative min-h-screen bg-gray-100">
-            <NavigationBar user={user}/>
+            <NavigationBar user={user} />
 
             {header && (
                 <header className="bg-white shadow">
@@ -15,7 +15,7 @@ export default function MasterLayout({ user, header, children }) {
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className={className}>{children}</main>
         </div>
     );
 }

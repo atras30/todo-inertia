@@ -4,10 +4,25 @@ import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link } from "@inertiajs/react";
+import { useWindowSize } from "@uidotdev/usehooks";
+import ButtonWithRippleEffect from "../Buttons/ButtonWithRippleEffect";
+import PrimaryButton from "@/Components/PrimaryButton";
+import _renderIcons from "@/Components/icons/IconRenderer";
 
 export default function NavigationBar({ user }) {
+    // Main State
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+    const [
+        showAuthenticationDropdownOptions,
+        setShowAuthenticationDropdownOptions,
+    ] = useState(false);
+
+    // Misc
+    const size = useWindowSize();
+    const isUserOnMobile = size.width < 640;
+    const isUserOnCreateNotePage =
+        route().current("notes.public") || route().current("notes.my");
 
     function _renderAuthenticatedMenus() {
         return (
@@ -79,10 +94,168 @@ export default function NavigationBar({ user }) {
 
     function _renderLoginButton() {
         return (
-
             <div className="relative ml-3">
                 <NavLink href={route("login")}>Login</NavLink>
             </div>
+        );
+    }
+
+    function _renderAuthenticatedDropdownContent() {
+        return (
+            <Fragment>
+                <Link
+                    className="p-2 text-sm border-l-4 text-slate-600 border-l-indigo-500 bg-slate-100"
+                    href={route("profile.edit")}
+                >
+                    Profile
+                </Link>
+                <Link
+                    className="p-2 text-sm border-l-4 text-slate-600 border-l-indigo-500 bg-slate-100"
+                    href={route("logout")}
+                    as="button"
+                    method="POST"
+                >
+                    Log Out
+                </Link>
+            </Fragment>
+        );
+    }
+
+    function _renderGuestDropdownContent() {
+        return (
+            <Fragment>
+                <Link
+                    className="p-2 text-sm border-l-4 text-slate-600 border-l-indigo-500 bg-slate-100"
+                    href={route("login")}
+                >
+                    Login
+                </Link>
+                <Link
+                    className="p-2 text-sm border-l-4 text-slate-600 border-l-indigo-500 bg-slate-100"
+                    href={route("register")}
+                >
+                    Register
+                </Link>
+            </Fragment>
+        );
+    }
+
+    function _renderAuthenticationDropdownContent() {
+        console.log(route("login"));
+
+        return (
+            <div
+                className="absolute top-0 right-0 translate-y-[-110%] p-2 m-2 bg-white border-black rounded shadow-md border-1"
+                style={{ width: "calc(100% - 1rem)" }}
+            >
+                <div
+                    id="authentication-dropdown-menus"
+                    className="grid grid-cols-1 gap-1 divide-y"
+                >
+                  {/* Render Content */}
+                    {user
+                        ? _renderAuthenticatedDropdownContent()
+                        : _renderGuestDropdownContent()}
+                </div>
+            </div>
+        );
+    }
+
+    function _renderBottomNavigationBarComponent() {
+        return (
+            <div className="flex items-center">
+                {/* Public Notes */}
+                <ButtonWithRippleEffect
+                    className={"py-2 grow flex items-center justify-center"}
+                >
+                    <div className="mx-auto">
+                        <div className="w-6 h-6 mx-auto mb-2">
+                            {_renderIcons("notes")}
+                        </div>
+                        <Link
+                            href={route("notes.public")}
+                            className="text-sm font-bold text-slate-600 "
+                        >
+                            Public Notes
+                        </Link>
+                    </div>
+                </ButtonWithRippleEffect>
+
+                {/* My Notes */}
+                <ButtonWithRippleEffect
+                    className={"py-2 grow flex items-center justify-center"}
+                >
+                    <div className="mx-auto">
+                        <div className="w-6 h-6 mx-auto mb-2">
+                            {_renderIcons("notes")}
+                        </div>
+                        <Link
+                            href={route("notes.my")}
+                            className="text-sm font-bold text-slate-600"
+                        >
+                            My Notes
+                        </Link>
+                    </div>
+                </ButtonWithRippleEffect>
+
+                {/* Authentication */}
+                <ButtonWithRippleEffect
+                    className={"flex items-center justify-center py-2 grow"}
+                    id={"authentication-menu"}
+                    onClick={() =>
+                        setShowAuthenticationDropdownOptions((prev) => !prev)
+                    }
+                >
+                    <div className="mx-auto">
+                        <div className="w-6 h-6 mx-auto mb-2">
+                            {_renderIcons("key")}
+                        </div>
+                        <div className="text-sm font-bold text-slate-600">
+                            Authentication
+                        </div>
+                    </div>
+                </ButtonWithRippleEffect>
+            </div>
+        );
+    }
+
+    function _renderBottomNavigationBar() {
+        //   Partial Views
+        function _renderAddNoteButton() {
+            return (
+                <div
+                    id="add-new-note-section"
+                    className="flex justify-end px-3 mb-2"
+                >
+                    <Link
+                        href={route("notes.form")}
+                        className="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        <PrimaryButton className={`opacity-50`}>
+                            Add New Note
+                        </PrimaryButton>
+                    </Link>
+                </div>
+            );
+        }
+
+        // Return Component
+        return (
+            <section className="fixed bottom-0 left-0 right-0 select-none">
+                {isUserOnCreateNotePage && _renderAddNoteButton()}
+
+                <div
+                    id="bottom-navigation-bar-section"
+                    className="relative shadwo bg-slate-200"
+                >
+                    {/* Authentication Dropdown Content */}
+                    {showAuthenticationDropdownOptions &&
+                        _renderAuthenticationDropdownContent()}
+
+                    {/* Bottom Navigation Bar */}
+                    {_renderBottomNavigationBarComponent()}
+                </div>
+            </section>
         );
     }
 
@@ -118,7 +291,7 @@ export default function NavigationBar({ user }) {
                         {/* Not authenticated */}
                         {!user && _renderLoginButton()}
 
-                        {/* AUhtneticated */}
+                        {/* Authenticated */}
                         {user && _renderAuthenticatedDropdownButton()}
                     </div>
 
@@ -165,6 +338,8 @@ export default function NavigationBar({ user }) {
                     </div>
                 </div>
             </div>
+
+            {isUserOnMobile && _renderBottomNavigationBar()}
 
             {/* Render navigation menus when expanded (user clicks hamburger button) */}
             <div

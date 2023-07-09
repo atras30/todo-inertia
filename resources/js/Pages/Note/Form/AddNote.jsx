@@ -56,7 +56,7 @@ export default function Dashboard({ auth }) {
     }
 
     return (
-        <MasterLayout user={auth.user} header={<Header />}>
+        <MasterLayout className={"p-2"} user={auth.user} header={<Header />}>
             <Head title="Create New Note" />
 
             <div className="space-y-3">

@@ -27,7 +27,7 @@ export default function Login({ auth, status, canResetPassword }) {
     };
 
     return (
-        <MasterLayout user={auth?.user}>
+        <MasterLayout className={"p-2"} user={auth?.user}>
             <Head title="Log in" />
 
             {status && (
@@ -38,7 +38,7 @@ export default function Login({ auth, status, canResetPassword }) {
 
             <div className="max-w-lg p-4 ml-auto bg-white rounded shadow-md me-auto">
                 <div className="text-2xl font-bold text-center">Login</div>
-                <div className="my-3 border-b-2 border-gray-200 horizontal-line"/>
+                <div className="my-3 border-b-2 border-gray-200 horizontal-line" />
                 <form onSubmit={submit} className="shadow-sm">
                     <div>
                         <InputLabel htmlFor="email" value="Email" />
@@ -94,18 +94,27 @@ export default function Login({ auth, status, canResetPassword }) {
                     </div>
 
                     <div className="flex items-center justify-end mt-4">
-                        {canResetPassword && (
+                        {/* {canResetPassword && (
                             <Link
                                 href={route("password.request")}
                                 className="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 Forgot your password?
                             </Link>
-                        )}
+                        )} */}
 
                         <PrimaryButton className="ml-4" disabled={processing}>
                             Log in
                         </PrimaryButton>
+                    </div>
+
+                    <div className="flex items-center justify-end mt-4">
+                        <Link
+                            href={route("register")}
+                            className="text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Don't have account yet ? Register Now!
+                        </Link>
                     </div>
                 </form>
             </div>

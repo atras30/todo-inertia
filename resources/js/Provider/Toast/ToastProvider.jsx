@@ -96,7 +96,7 @@ export default function ToastProvider({ children }) {
 
     return (
         <ToastContext.Provider value={{ success, error, info }}>
-            <div className="space-y-2" style={masterStyle.toastContainer}>
+            <div className="w-full space-y-2 sm:max-w-xl" style={masterStyle.toastContainer}>
                 {toasts?.map((toast, index) => {
                     return (
                         <Toast

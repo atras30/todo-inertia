@@ -141,21 +141,6 @@ export default function Note({ auth }) {
         ));
     }
 
-    function _renderAddNoteButton() {
-        return (
-            <Link
-                href={route("notes.form")}
-                className="z-10 text-sm text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                <PrimaryButton
-                    className={`sm:static sm:opacity-100 sm:end-0 fixed bottom-[1rem] opacity-50 end-[1rem]`}
-                >
-                    Add New Note
-                </PrimaryButton>
-            </Link>
-        );
-    }
-
     function _renderDeleteModal() {
         return (
             <div
@@ -177,36 +162,28 @@ export default function Note({ auth }) {
                         My Notes
                     </h2>
                 </div>
-
-                {_renderAddNoteButton()}
             </div>
         );
     }
 
     return (
-        <MasterLayout user={auth.user} header={<Header />}>
+        <MasterLayout className={"p-4 max-w-6xl mx-auto"} user={auth.user} header={<Header />}>
             <Head title="Notes" />
 
-            <div className="py-6">
-                <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="space-y-3">
-                        {_renderNotes()}
+            <div className="space-y-3">
+                {_renderNotes()}
 
-                        {/* Is fetching data ? show loading. else, show button */}
-                        {isFetchingData ? (
-                            <NoteSkeleton count={5} />
-                        ) : (
-                            <PrimaryButton
-                                className={`w-full`}
-                                onClick={() => fetchNotes(currentPage)}
-                            >
-                                <div className="w-full text-center">
-                                    Load More
-                                </div>
-                            </PrimaryButton>
-                        )}
-                    </div>
-                </div>
+                {/* Is fetching data ? show loading. else, show button */}
+                {isFetchingData ? (
+                    <NoteSkeleton count={5} />
+                ) : (
+                    <PrimaryButton
+                        className={`w-full`}
+                        onClick={() => fetchNotes(currentPage)}
+                    >
+                        <div className="w-full text-center">Load More</div>
+                    </PrimaryButton>
+                )}
             </div>
 
             {/* Modals */}

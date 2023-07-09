@@ -5,6 +5,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
+import MasterLayout from '@/Layouts/MasterLayout';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -27,10 +28,10 @@ export default function Register() {
     };
 
     return (
-        <GuestLayout>
+        <MasterLayout className={"p-2"}>
             <Head title="Register" />
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className='p-4 bg-white border rounded shadow-md border-1'>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
@@ -112,6 +113,6 @@ export default function Register() {
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </MasterLayout>
     );
 }
