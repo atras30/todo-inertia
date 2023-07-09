@@ -2,14 +2,15 @@ import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
 import Toast, { ToastContext } from "@/Provider/Toast/ToastProvider";
 import AnonymousAvatar from "@/Components/Icons/AnonymousAvatar";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AuthenticatedLayout from "@/Layouts/MasterLayout";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
 import { useContext, useEffect, useState } from "react";
 import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
+import MasterLayout from "@/Layouts/MasterLayout";
 
-export default function Note() {
+export default function Note({auth}) {
     // Main State
     const [notes, setNotes] = useState([]);
     // Pagination State
@@ -112,7 +113,7 @@ export default function Note() {
     }
 
     return (
-        <GuestLayout header={<Header />}>
+        <MasterLayout user={auth?.user} header={<Header />}>
             <Head title="Notes" />
 
             <div className="py-6">
@@ -136,6 +137,6 @@ export default function Note() {
                     </div>
                 </div>
             </div>
-        </GuestLayout>
+        </MasterLayout>
     );
 }

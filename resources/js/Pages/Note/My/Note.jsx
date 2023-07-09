@@ -1,11 +1,11 @@
 import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
 import AnonymousAvatar from "@/Components/Icons/AnonymousAvatar";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import axiosInstance from "@/Provider/Axios/AxiosProvider";
+import MasterLayout from "@/Layouts/MasterLayout";
+import axiosInstance, { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 
 export default function Note({ auth }) {
     // Main State
@@ -14,6 +14,12 @@ export default function Note({ auth }) {
     const [currentPage, setCurrentPage] = useState(1);
     // Loading State
     const [isFetchingData, setIsFetchingData] = useState(false);
+
+    // Misc
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    // Context
+    const axiosInstance = useContext(AxiosContext);
 
     useEffect(() => {
         fetchNotes(currentPage);
@@ -29,16 +35,11 @@ export default function Note({ auth }) {
                     currentPage: currentPage,
                 })
             )
-            .catch((error) => {
-                return;
-            })
             .finally(() => {
                 setIsFetchingData(false);
             });
 
-        console.log(response.data);
-
-        setNotes((prev) => [...prev, ...response.data.data]);
+        setNotes((prev) => [...prev, ...response?.data?.data]);
     }
 
     function _renderNotes() {
@@ -66,9 +67,74 @@ export default function Note({ auth }) {
                         <div className="my-2 border-b-2 border-gray-300" />
 
                         <div>
-                            {format(new Date(note?.created_at), "dd MMMM yyyy")}
+                            <div>
+                                {format(
+                                    new Date(note?.created_at),
+                                    "dd MMMM yyyy"
+                                )}
+                            </div>
+                            <div>
+                                {format(new Date(note?.created_at), "HH:mm")}
+                            </div>
                         </div>
-                        <div>{format(new Date(note?.created_at), "HH:mm")}</div>
+
+                        <div
+                            className="w-8 h-8 mt-2 ml-auto cursor-pointer"
+                            onClick={() => setShowDeleteModal(true)}
+                        >
+                            <svg
+                                className="w-full h-full"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                stroke="#ff1414"
+                            >
+                                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                                <g
+                                    id="SVGRepo_tracerCarrier"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                ></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    {" "}
+                                    <path
+                                        d="M10 12V17"
+                                        stroke="#ff0000"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                        d="M14 12V17"
+                                        stroke="#ff0000"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                        d="M4 7H20"
+                                        stroke="#ff0000"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                        d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10"
+                                        stroke="#ff0000"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    ></path>{" "}
+                                    <path
+                                        d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
+                                        stroke="#ff0000"
+                                        strokeWidth="1.8"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    ></path>{" "}
+                                </g>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -90,6 +156,19 @@ export default function Note({ auth }) {
         );
     }
 
+    function _renderDeleteModal() {
+        return (
+            <div
+                className="fixed top-0 bottom-0 left-0 right-0 bg-slate-200"
+                style={{ opacity: ".8" }}
+            >
+                <div className="fixed bg-red-600 top-50 left-50 w-2xl">
+                    testing
+                </div>
+            </div>
+        );
+    }
+
     function Header() {
         return (
             <div className="flex justify-between">
@@ -105,7 +184,7 @@ export default function Note({ auth }) {
     }
 
     return (
-        <AuthenticatedLayout user={auth.user} header={<Header />}>
+        <MasterLayout user={auth.user} header={<Header />}>
             <Head title="Notes" />
 
             <div className="py-6">
@@ -129,6 +208,9 @@ export default function Note({ auth }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+
+            {/* Modals */}
+            {showDeleteModal && _renderDeleteModal()}
+        </MasterLayout>
     );
 }

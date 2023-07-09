@@ -2,13 +2,13 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import GuestLayout from "@/Layouts/GuestLayout";
 import { ToastContext } from "@/Provider/Toast/ToastProvider";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useContext, useEffect } from "react";
 import Select from "react-select";
 import { router } from "@inertiajs/react";
 import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
+import MasterLayout from "@/Layouts/MasterLayout";
 
 export default function Dashboard({ auth }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -56,7 +56,7 @@ export default function Dashboard({ auth }) {
     }
 
     return (
-        <GuestLayout header={<Header />}>
+        <MasterLayout user={auth.user} header={<Header />}>
             <Head title="Create New Note" />
 
             <div className="space-y-3">
@@ -127,6 +127,6 @@ export default function Dashboard({ auth }) {
                     </div>
                 </form>
             </div>
-        </GuestLayout>
+        </MasterLayout>
     );
 }

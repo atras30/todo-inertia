@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateNoteRequest;
+use App\Http\Requests\DeleteNoteRequest;
 use App\Models\Note;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -45,6 +46,11 @@ class NoteController extends Controller
         return response()->json([
             "message" => "A new note created!"
         ], Response::HTTP_CREATED);
+    }
+
+    // DELETE
+    public function delete(DeleteNoteRequest $request) {
+        dd($request->all());
     }
 
     // PAGINATION
