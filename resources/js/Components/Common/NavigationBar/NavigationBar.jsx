@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
@@ -8,11 +8,11 @@ import { useWindowSize } from "@uidotdev/usehooks";
 import ButtonWithRippleEffect from "../Buttons/ButtonWithRippleEffect";
 import PrimaryButton from "@/Components/PrimaryButton";
 import _renderIcons from "@/Components/icons/IconRenderer";
+import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
+import { HelperContext } from "@/Provider/Helper/HelperProvider";
 
 export default function NavigationBar({ user }) {
     // Main State
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
     const [
         showAuthenticationDropdownOptions,
         setShowAuthenticationDropdownOptions,
@@ -24,22 +24,7 @@ export default function NavigationBar({ user }) {
     const isUserOnCreateNotePage =
         route().current("notes.public") || route().current("notes.my");
 
-    function _renderAuthenticatedMenus() {
-        return (
-            <Fragment>
-                <ResponsiveNavLink href={route("profile.edit")}>
-                    Profile
-                </ResponsiveNavLink>
-                <ResponsiveNavLink
-                    method="post"
-                    href={route("logout")}
-                    as="button"
-                >
-                    Log Out
-                </ResponsiveNavLink>
-            </Fragment>
-        );
-    }
+    const {logo} = useContext(HelperContext);
 
     function _renderAuthenticatedDropdownButton() {
         return (
@@ -86,12 +71,6 @@ export default function NavigationBar({ user }) {
         );
     }
 
-    function _renderLoginButtonForMobile() {
-        return (
-            <ResponsiveNavLink href={route("login")}>Login</ResponsiveNavLink>
-        );
-    }
-
     function _renderLoginButton() {
         return (
             <div className="relative ml-3">
@@ -110,7 +89,7 @@ export default function NavigationBar({ user }) {
                     Profile
                 </Link>
                 <Link
-                    className="p-2 text-sm border-l-4 text-slate-600 border-l-indigo-500 bg-slate-100"
+                    className="p-2 text-sm text-left border-l-4 text-slate-600 border-l-indigo-500 bg-slate-100"
                     href={route("logout")}
                     as="button"
                     method="POST"
@@ -141,18 +120,15 @@ export default function NavigationBar({ user }) {
     }
 
     function _renderAuthenticationDropdownContent() {
-        console.log(route("login"));
-
         return (
             <div
-                className="absolute top-0 right-0 translate-y-[-110%] p-2 m-2 bg-white border-black rounded shadow-md border-1"
-                style={{ width: "calc(100% - 1rem)" }}
+                className="border border-1 shadow-lg border-black absolute top-0 right-0 translate-y-[-120%] p-2 m-2 bg-white rounded min-w-[12rem]"
             >
                 <div
                     id="authentication-dropdown-menus"
                     className="grid grid-cols-1 gap-1 divide-y"
                 >
-                  {/* Render Content */}
+                    {/* Render Content */}
                     {user
                         ? _renderAuthenticatedDropdownContent()
                         : _renderGuestDropdownContent()}
@@ -166,54 +142,45 @@ export default function NavigationBar({ user }) {
             <div className="flex items-center">
                 {/* Public Notes */}
                 <ButtonWithRippleEffect
-                    className={"py-2 grow flex items-center justify-center"}
+                    className={"flex items-center justify-center grow"}
                 >
-                    <div className="mx-auto">
+                    <Link
+                        href={route("notes.public")}
+                        className="w-full text-sm font-bold grow text-slate-600"
+                    >
                         <div className="w-6 h-6 mx-auto mb-2">
                             {_renderIcons("notes")}
                         </div>
-                        <Link
-                            href={route("notes.public")}
-                            className="text-sm font-bold text-slate-600 "
-                        >
-                            Public Notes
-                        </Link>
-                    </div>
+                        <p>Public Notes</p>
+                    </Link>
                 </ButtonWithRippleEffect>
 
                 {/* My Notes */}
                 <ButtonWithRippleEffect
-                    className={"py-2 grow flex items-center justify-center"}
+                    className={"flex items-center justify-center grow"}
                 >
-                    <div className="mx-auto">
+                    <Link
+                        href={route("notes.my")}
+                        className="w-full text-sm font-bold grow text-slate-600"
+                    >
                         <div className="w-6 h-6 mx-auto mb-2">
-                            {_renderIcons("notes")}
+                            {_renderIcons("notes-2")}
                         </div>
-                        <Link
-                            href={route("notes.my")}
-                            className="text-sm font-bold text-slate-600"
-                        >
-                            My Notes
-                        </Link>
-                    </div>
+                        <p>My Notes</p>
+                    </Link>
                 </ButtonWithRippleEffect>
 
                 {/* Authentication */}
                 <ButtonWithRippleEffect
-                    className={"flex items-center justify-center py-2 grow"}
-                    id={"authentication-menu"}
+                    className={"flex items-center justify-center grow"}
                     onClick={() =>
                         setShowAuthenticationDropdownOptions((prev) => !prev)
                     }
                 >
-                    <div className="mx-auto">
-                        <div className="w-6 h-6 mx-auto mb-2">
-                            {_renderIcons("key")}
-                        </div>
-                        <div className="text-sm font-bold text-slate-600">
-                            Authentication
-                        </div>
+                    <div className="w-6 h-6 mx-auto mb-2">
+                        {_renderIcons("key")}
                     </div>
+                    <p>Authentication</p>
                 </ButtonWithRippleEffect>
             </div>
         );
@@ -241,7 +208,7 @@ export default function NavigationBar({ user }) {
 
         // Return Component
         return (
-            <section className="fixed bottom-0 left-0 right-0 select-none">
+            <section className="fixed bottom-0 left-0 right-0 z-10 select-none">
                 {isUserOnCreateNotePage && _renderAddNoteButton()}
 
                 <div
@@ -261,12 +228,17 @@ export default function NavigationBar({ user }) {
 
     return (
         <nav className="bg-white border-b border-gray-100">
-            <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="max-w-7xl pe-6">
                 <div className="flex justify-between h-16">
                     <div className="flex">
                         <div className="flex items-center shrink-0">
-                            <Link href="/">
-                                <ApplicationLogo className="block w-auto text-gray-800 fill-current h-9" />
+                            <Link href="/" className="h-full">
+                                <img
+                                    className="object-contain w-full h-full"
+                                    src={logo}
+                                    alt="Logo"
+                                ></img>
+                                {/* <ApplicationLogo className="block w-auto text-gray-800 fill-current h-9" /> */}
                             </Link>
                         </div>
 
@@ -294,78 +266,10 @@ export default function NavigationBar({ user }) {
                         {/* Authenticated */}
                         {user && _renderAuthenticatedDropdownButton()}
                     </div>
-
-                    {/* Expand navbar menu on mobile */}
-                    <div className="flex items-center -mr-2 sm:hidden">
-                        <button
-                            onClick={() =>
-                                setShowingNavigationDropdown(
-                                    (previousState) => !previousState
-                                )
-                            }
-                            className="inline-flex items-center justify-center p-2 text-gray-400 transition duration-150 ease-in-out rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500"
-                        >
-                            <svg
-                                className="w-6 h-6"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    className={
-                                        !showingNavigationDropdown
-                                            ? "inline-flex"
-                                            : "hidden"
-                                    }
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                                <path
-                                    className={
-                                        showingNavigationDropdown
-                                            ? "inline-flex"
-                                            : "hidden"
-                                    }
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
-                    </div>
                 </div>
             </div>
 
             {isUserOnMobile && _renderBottomNavigationBar()}
-
-            {/* Render navigation menus when expanded (user clicks hamburger button) */}
-            <div
-                className={
-                    (showingNavigationDropdown ? "block" : "hidden") +
-                    " sm:hidden"
-                }
-            >
-                <div className="pt-2 pb-3 space-y-1">
-                    <ResponsiveNavLink
-                        href={route("notes.public")}
-                        active={route().current("notes.public")}
-                    >
-                        Notes
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                        href={route("notes.my")}
-                        active={route().current("notes.my")}
-                    >
-                        My Notes
-                    </ResponsiveNavLink>
-
-                    {user && _renderAuthenticatedMenus()}
-                    {!user && _renderLoginButtonForMobile()}
-                </div>
-            </div>
         </nav>
     );
 }

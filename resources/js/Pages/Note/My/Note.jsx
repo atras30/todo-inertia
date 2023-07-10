@@ -2,10 +2,10 @@ import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
 import AnonymousAvatar from "@/Components/Icons/AnonymousAvatar";
 import MasterLayout from "@/Layouts/MasterLayout";
-import axiosInstance, { AxiosContext } from "@/Provider/Axios/AxiosProvider";
+import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
-import { Fragment, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import _renderIcons from "@/Components/icons/IconRenderer";
 import { ToastContext } from "@/Provider/Toast/ToastProvider";
 
@@ -16,9 +16,8 @@ export default function Note({ auth }) {
     const [currentPage, setCurrentPage] = useState(1);
     // Loading State
     const [isFetchingData, setIsFetchingData] = useState(false);
-
     // Misc
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [hasNextPage, setHasNextPage] = useState(false);
 
     // Context
     const axiosInstance = useContext(AxiosContext);
@@ -59,13 +58,18 @@ export default function Note({ auth }) {
             >
                 <div className="flex justify-between">
                     <div>
-                        <p className="mb-2 font-bold underline decoration-solid">
+                        <p className="mb-1 font-bold underline decoration-solid">
                             {note?.title}
                         </p>
 
-                        <pre className="break-all">{note?.body || "-"}</pre>
+                        <pre className="whitespace-pre-wrap">
+                            {note?.body || "-"}
+                        </pre>
                     </div>
                     <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
+                        <p className="mb-2 text-xs font-bold underline text-slate-500">
+                            {note?.visibility} Note
+                        </p>
                         <span className="flex items-start justify-center gap-2 ml-2">
                             <AnonymousAvatar className="w-6 h-6" />
                             {note?.user !== null
@@ -150,19 +154,6 @@ export default function Note({ auth }) {
         ));
     }
 
-    function _renderDeleteModal() {
-        return (
-            <div
-                className="fixed top-0 bottom-0 left-0 right-0 bg-slate-200"
-                style={{ opacity: ".8" }}
-            >
-                <div className="fixed bg-red-600 top-50 left-50 w-2xl">
-                    testing
-                </div>
-            </div>
-        );
-    }
-
     async function handleDeleteNote(id) {
         const response = await axiosInstance.delete(
             route("notes.delete", {
@@ -182,40 +173,50 @@ export default function Note({ auth }) {
                         My Notes
                     </h2>
                 </div>
-                <PrimaryButton className="flex items-center gap-2 text-xl font-semibold leading-tight text-gray-800 align-middle">
-                    <span>{_renderIcons("recycle-bin")}</span>
-                    Recycle Bin
-                </PrimaryButton>
+
+                <div className="flex flex-row-reverse gap-2">
+                    <Link href={route("notes.form")}>
+                        <PrimaryButton className="flex items-center gap-2 text-xl font-semibold leading-tight text-gray-800 align-middle">
+                            <span className="w-6">{_renderIcons("add")}</span>
+                            Add New Note
+                        </PrimaryButton>
+                    </Link>
+                    <Link href={route("notes.bin")}>
+                        <PrimaryButton className="flex items-center gap-2 text-xl font-semibold leading-tight text-gray-800 align-middle">
+                            <span>{_renderIcons("recycle-bin")}</span>
+                            Recycle Bin
+                        </PrimaryButton>
+                    </Link>
+                </div>
             </div>
         );
     }
 
     return (
         <MasterLayout
-            className={"p-4 max-w-6xl mx-auto"}
+            className={"p-2 max-w-6xl mx-auto"}
             user={auth.user}
             header={<Header />}
         >
             <Head title="Notes" />
 
-            <div className="space-y-3">
+            <div className="space-y-2">
                 {_renderNotes()}
 
                 {/* Is fetching data ? show loading. else, show button */}
                 {isFetchingData ? (
-                    <NoteSkeleton count={5} />
+                    <NoteSkeleton count={2} />
                 ) : (
-                    <PrimaryButton
-                        className={`w-full`}
-                        onClick={() => fetchNotes(currentPage)}
-                    >
-                        <div className="w-full text-center">Load More</div>
-                    </PrimaryButton>
+                    hasNextPage && (
+                        <PrimaryButton
+                            className={`w-full`}
+                            onClick={() => fetchNotes(currentPage)}
+                        >
+                            <div className="w-full text-center">Load More</div>
+                        </PrimaryButton>
+                    )
                 )}
             </div>
-
-            {/* Modals */}
-            {showDeleteModal && _renderDeleteModal()}
         </MasterLayout>
     );
 }

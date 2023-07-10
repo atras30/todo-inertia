@@ -6,7 +6,7 @@ export default function NoteSkeleton({ count = 1 }) {
             return (
                 <div
                     key={index}
-                    className="w-full p-4 mx-auto border border-blue-300 rounded-md shadow max-w bg-slate-100"
+                    className="z-0 w-full p-4 mx-auto border border-blue-300 rounded-md shadow max-w bg-slate-100"
                 >
                     <div className="flex space-x-4 animate-pulse">
                         <div className="w-10 h-10 rounded-full bg-slate-200"></div>

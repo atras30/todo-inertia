@@ -27,6 +27,11 @@ class NoteController extends Controller
         return Inertia::render("Note/Form/AddNote");
     }
 
+    public function showRecycleBin()
+    {
+        return Inertia::render("Note/My/Bin");
+    }
+
     // POST
     public function create(CreateNoteRequest $request)
     {
@@ -65,6 +70,23 @@ class NoteController extends Controller
         ], Response::HTTP_OK);
     }
 
+    // RESTORE
+    public function restoreRecycleBinNotes(Request $request)
+    {
+        if ($request->id == null)
+            return $this->throwInternalServerError("Id must be filled.");
+
+        try {
+            Note::onlyTrashed()->where("id", $request->id)->restore();
+        } catch (\Exception $e) {
+            $this->throwInternalServerError($e->getMessage());
+        }
+
+        return response()->json([
+            "message" => "Successfully restored a note."
+        ], Response::HTTP_OK);
+    }
+
     public function throwInternalServerError($message)
     {
         return response()->json([
@@ -74,7 +96,7 @@ class NoteController extends Controller
 
     // PAGINATION
 
-    public function paginateNotes(Request $request)
+    public function paginatePrivateNotes(Request $request)
     {
         //Define the pagination limit
         $paginationLimit = 20;
@@ -90,23 +112,26 @@ class NoteController extends Controller
         $data = $notesQuery->get();
         // Total data length
         $count = $data->count();
+        // Check if next page available
+        $hasNextPage = $request->currentPage * $paginationLimit < $totalData;
 
         $pagination = [
             "totalData" => $totalData,
             "count" => $count,
             "data" => $data,
+            "hasNextPage" => $hasNextPage
         ];
 
         return response()->json($pagination, Response::HTTP_OK);
     }
 
-    public function paginatePublicNotes(Request $request)
+    public function paginateRecycleBinNotes(Request $request)
     {
         //Define the pagination limit
         $paginationLimit = 20;
 
         // Define the query and filter
-        $notesQuery = Note::where("visibility", "public")->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
+        $notesQuery = Note::onlyTrashed()->where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
 
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
@@ -116,11 +141,41 @@ class NoteController extends Controller
         $data = $notesQuery->get();
         // Total data length
         $count = $data->count();
+        // Check if next page available
+        $hasNextPage = $request->currentPage * $paginationLimit < $totalData;
 
         $pagination = [
             "totalData" => $totalData,
             "count" => $count,
             "data" => $data,
+            "hasNextPage" => $hasNextPage
+        ];
+
+        return response()->json($pagination, Response::HTTP_OK);
+    }
+
+    public function paginatePublicNotes(Request $request)
+    {
+        //Define the pagination limit
+        $paginationLimit = 20;
+        // Define the query and filter
+        $notesQuery = Note::where("visibility", "public")->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
+        // Get total data of the filtered query
+        $totalData = $notesQuery->count();
+        // Set offset and limit
+        $notesQuery = $notesQuery->offset($paginationLimit * ($request->currentPage - 1))->limit($paginationLimit);
+        // Get data
+        $data = $notesQuery->get();
+        // Total data length
+        $count = $data->count();
+
+        $hasNextPage = $request->currentPage * $paginationLimit < $totalData;
+
+        $pagination = [
+            "totalData" => $totalData,
+            "count" => $count,
+            "data" => $data,
+            "hasNextPage" => $hasNextPage
         ];
 
         return response()->json($pagination, Response::HTTP_OK);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Helper\AssetController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,8 @@ Route::get('/', function () {
     return to_route("notes.public");
 });
 
+Route::get("/asset/image", [AssetController::class, 'getImageFromUrl']);
+
 // Notes
 Route::prefix("notes")->group(function() {
     // Public
@@ -30,13 +33,19 @@ Route::prefix("notes")->group(function() {
 
     // My
     Route::get('/my', [NoteController::class, 'myNotes'])->middleware(['auth', 'verified'])->name('notes.my');
-    Route::get('/my/paginate', [NoteController::class, 'paginateNotes'])->name('notes.my.paginate');
+    Route::get('/my/paginate', [NoteController::class, 'paginatePrivateNotes'])->name('notes.my.paginate');
+
+    // Recycle Bin
+    Route::get('/my/bin', [NoteController::class, 'showRecycleBin'])->middleware(['auth', 'verified'])->name('notes.bin');
+    Route::put('/my/bin/restore', [NoteController::class, 'restoreRecycleBinNotes'])->middleware(['auth', 'verified'])->name('notes.my.bin.restore');
+    Route::get('/my/bin/paginate', [NoteController::class, 'paginateRecycleBinNotes'])->name('notes.my.bin.paginate');
 
     // Create
     Route::post('/', [NoteController::class, 'create'])->name('notes.create');
 
     // Delete
     Route::delete('/{id}', [NoteController::class, 'delete'])->name('notes.delete');
+
 });
 
 Route::middleware('auth')->group(function () {

@@ -3,6 +3,7 @@ import Ripples from "react-ripples";
 export default function ButtonWithRippleEffect({
     children,
     className,
+    buttonClassName,
     ...props
 }) {
     return (
@@ -11,7 +12,7 @@ export default function ButtonWithRippleEffect({
             {...props}
             className={`select-none ${className}`}
         >
-            <button>{children}</button>
+            <button className={"w-full py-2"}>{children}</button>
         </Ripples>
     );
 }

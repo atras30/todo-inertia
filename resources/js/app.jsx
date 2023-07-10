@@ -6,6 +6,7 @@ import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import AxiosProvider from "./Provider/Axios/AxiosProvider";
 import ToastProvider from "./Provider/Toast/ToastProvider";
+import HelperProvider from "./Provider/Helper/HelperProvider";
 
 const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "Notes";
@@ -23,7 +24,9 @@ createInertiaApp({
         root.render(
             <ToastProvider>
                 <AxiosProvider>
+                    <HelperProvider>
                         <App {...props} />
+                    </HelperProvider>
                 </AxiosProvider>
             </ToastProvider>
         );
