@@ -61,7 +61,7 @@ export default function Note({ auth }) {
                             {note?.title}
                         </p>
 
-                        <pre className="whitespace-pre-wrap">
+                        <pre className="break-all whitespace-pre-wrap">
                             {note?.body || "-"}
                         </pre>
                     </div>
