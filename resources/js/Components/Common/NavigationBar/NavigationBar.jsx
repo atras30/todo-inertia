@@ -1,14 +1,11 @@
 import { Fragment, useContext, useEffect, useState } from "react";
-import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link } from "@inertiajs/react";
 import { useWindowSize } from "@uidotdev/usehooks";
 import ButtonWithRippleEffect from "../Buttons/ButtonWithRippleEffect";
 import PrimaryButton from "@/Components/PrimaryButton";
 import _renderIcons from "@/Components/icons/IconRenderer";
-import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 import { HelperContext } from "@/Provider/Helper/HelperProvider";
 
 export default function NavigationBar({ user }) {
@@ -24,7 +21,7 @@ export default function NavigationBar({ user }) {
     const isUserOnCreateNotePage =
         route().current("notes.public") || route().current("notes.my");
 
-    const {logo} = useContext(HelperContext);
+    const { logo } = useContext(HelperContext);
 
     function _renderAuthenticatedDropdownButton() {
         return (
@@ -74,7 +71,9 @@ export default function NavigationBar({ user }) {
     function _renderLoginButton() {
         return (
             <div className="relative ml-3">
-                <NavLink href={route("login")}>Login</NavLink>
+                <NavLink href={route("login")} className="text-white">
+                    Login
+                </NavLink>
             </div>
         );
     }
@@ -121,9 +120,7 @@ export default function NavigationBar({ user }) {
 
     function _renderAuthenticationDropdownContent() {
         return (
-            <div
-                className="border border-1 shadow-lg border-black absolute top-0 right-0 translate-y-[-120%] p-2 m-2 bg-white rounded min-w-[12rem]"
-            >
+            <div className="border border-1 shadow-lg border-black absolute top-0 right-0 translate-y-[-120%] p-2 m-2 bg-white rounded min-w-[12rem]">
                 <div
                     id="authentication-dropdown-menus"
                     className="grid grid-cols-1 gap-1 divide-y"
@@ -171,17 +168,35 @@ export default function NavigationBar({ user }) {
                 </ButtonWithRippleEffect>
 
                 {/* Authentication */}
-                <ButtonWithRippleEffect
-                    className={"flex items-center justify-center grow"}
-                    onClick={() =>
-                        setShowAuthenticationDropdownOptions((prev) => !prev)
-                    }
-                >
-                    <div className="w-6 h-6 mx-auto mb-2">
-                        {_renderIcons("key")}
-                    </div>
-                    <p>Authentication</p>
-                </ButtonWithRippleEffect>
+                {user ? (
+                    <ButtonWithRippleEffect
+                        className={"flex items-center justify-center grow text-slate-600"}
+                        onClick={() =>
+                            setShowAuthenticationDropdownOptions(
+                                (prev) => !prev
+                            )
+                        }
+                    >
+                        <div className="w-6 h-6 mx-auto mb-2">
+                            {_renderIcons("user-icon")}
+                        </div>
+                        <p>{user.name}</p>
+                    </ButtonWithRippleEffect>
+                ) : (
+                    <ButtonWithRippleEffect
+                        className={"flex items-center justify-center grow text-slate-600"}
+                        onClick={() =>
+                            setShowAuthenticationDropdownOptions(
+                                (prev) => !prev
+                            )
+                        }
+                    >
+                        <div className="w-6 h-6 mx-auto mb-2">
+                            {_renderIcons("key")}
+                        </div>
+                        <p>Authentication</p>
+                    </ButtonWithRippleEffect>
+                )}
             </div>
         );
     }
@@ -213,7 +228,7 @@ export default function NavigationBar({ user }) {
 
                 <div
                     id="bottom-navigation-bar-section"
-                    className="relative shadwo bg-slate-200"
+                    className="relative shadow bg-slate-200"
                 >
                     {/* Authentication Dropdown Content */}
                     {showAuthenticationDropdownOptions &&
@@ -227,8 +242,8 @@ export default function NavigationBar({ user }) {
     }
 
     return (
-        <nav className="bg-white border-b border-gray-100">
-            <div className="max-w-7xl pe-6">
+        <nav className="bg-[#cf5260] border-b border-gray-100">
+            <div className="pe-6">
                 <div className="flex justify-between h-16">
                     <div className="flex">
                         <div className="flex items-center shrink-0">
@@ -246,12 +261,14 @@ export default function NavigationBar({ user }) {
                             <NavLink
                                 href={route("notes.public")}
                                 active={route().current("notes.public")}
+                                className="text-white focus:text-gray-200"
                             >
                                 Notes
                             </NavLink>
                             <NavLink
                                 href={route("notes.my")}
                                 active={route().current("notes.my")}
+                                className="text-white focus:text-gray-200"
                             >
                                 My Notes
                             </NavLink>

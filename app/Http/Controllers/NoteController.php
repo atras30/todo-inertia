@@ -59,10 +59,16 @@ class NoteController extends Controller
         if ($id == null)
             return $this->throwInternalServerError("Id must be filled.");
 
+        $note = Note::where("id", $id)->firstOrFail();
+        if($note->user_id !== $request->user()->id && $request->user()->is_super_admin === 0)
+            return $this->throwInternalServerError("You can't delete other people notes");
+
         try {
-            Note::destroy($id);
+            $note->deleted_by = $request->user()->name ?? "System";
+            $note->save();
+            $note->delete();
         } catch (\Exception $e) {
-            $this->throwInternalServerError($e->getMessage());
+            throw $e;
         }
 
         return response()->json([
@@ -77,9 +83,12 @@ class NoteController extends Controller
             return $this->throwInternalServerError("Id must be filled.");
 
         try {
-            Note::onlyTrashed()->where("id", $request->id)->restore();
+            $note = Note::onlyTrashed()->where("id", $request->id)->firstOrFail();
+            $note->deleted_by = null;
+            $note->save();
+            $note->restore();
         } catch (\Exception $e) {
-            $this->throwInternalServerError($e->getMessage());
+            throw $e;
         }
 
         return response()->json([
@@ -91,7 +100,7 @@ class NoteController extends Controller
     {
         return response()->json([
             "message" => $message
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     // PAGINATION
@@ -131,7 +140,7 @@ class NoteController extends Controller
         $paginationLimit = 20;
 
         // Define the query and filter
-        $notesQuery = Note::onlyTrashed()->where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
+        $notesQuery = Note::onlyTrashed()->where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('deleted_at', 'desc');
 
         // Get total data of the filtered query
         $totalData = $notesQuery->count();

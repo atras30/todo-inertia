@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { useContext, useEffect, useState } from "react";
 import _renderIcons from "@/Components/icons/IconRenderer";
 import { ToastContext } from "@/Provider/Toast/ToastProvider";
+import { HelperContext } from "@/Provider/Helper/HelperProvider";
 
 export default function Note({ auth }) {
     // Main State
@@ -22,6 +23,7 @@ export default function Note({ auth }) {
     // Context
     const axiosInstance = useContext(AxiosContext);
     const toast = useContext(ToastContext);
+    const { isUserOnMobile } = useContext(HelperContext);
 
     useEffect(() => {
         fetchNotes(currentPage);
@@ -58,11 +60,14 @@ export default function Note({ auth }) {
             >
                 <div className="flex justify-between">
                     <div>
-                        <p className="mb-1 font-bold underline decoration-solid">
-                            {note?.title}
-                        </p>
+                        <div className="flex gap-2 mb-2">
+                            <AnonymousAvatar className="w-6 h-6" />
+                            <p className="mb-1 font-bold underline decoration-solid">
+                                {note?.title}
+                            </p>
+                        </div>
 
-                        <pre className="break-all whitespace-pre-wrap">
+                        <pre className="text-justify whitespace-pre-wrap pe-3">
                             {note?.body || "-"}
                         </pre>
                     </div>
@@ -71,7 +76,6 @@ export default function Note({ auth }) {
                             {note?.visibility} Note
                         </p>
                         <span className="flex items-start justify-center gap-2 ml-2">
-                            <AnonymousAvatar className="w-6 h-6" />
                             {note?.user !== null
                                 ? note?.user?.name || "-"
                                 : "Anonymous"}
@@ -166,6 +170,16 @@ export default function Note({ auth }) {
     }
 
     function Header() {
+        function _renderAddNewNoteButton() {
+            return (
+                <Link href={route("notes.form")}>
+                    <PrimaryButton className="flex items-center gap-2 text-xl font-semibold leading-tight text-gray-800 align-middle">
+                        <span className="w-6">{_renderIcons("add")}</span>
+                        Add New Note
+                    </PrimaryButton>
+                </Link>
+            );
+        }
         return (
             <div className="flex justify-between">
                 <div className="flex items-center justify-between ">
@@ -175,12 +189,7 @@ export default function Note({ auth }) {
                 </div>
 
                 <div className="flex flex-row-reverse gap-2">
-                    <Link href={route("notes.form")}>
-                        <PrimaryButton className="flex items-center gap-2 text-xl font-semibold leading-tight text-gray-800 align-middle">
-                            <span className="w-6">{_renderIcons("add")}</span>
-                            Add New Note
-                        </PrimaryButton>
-                    </Link>
+                    {!isUserOnMobile && _renderAddNewNoteButton()}
                     <Link href={route("notes.bin")}>
                         <PrimaryButton className="flex items-center gap-2 text-xl font-semibold leading-tight text-gray-800 align-middle">
                             <span>{_renderIcons("recycle-bin")}</span>

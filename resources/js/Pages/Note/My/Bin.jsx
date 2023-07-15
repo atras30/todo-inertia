@@ -77,17 +77,19 @@ export default function Note({ auth }) {
             >
                 <div className="flex justify-between">
                     <div>
-                        <p className="mb-2 font-bold underline decoration-solid">
-                            {note?.title}
-                        </p>
+                        <div className="flex gap-2 mb-2">
+                            <AnonymousAvatar className="w-6 h-6" />
+                            <p className="mb-1 font-bold underline decoration-solid">
+                                {note?.title}
+                            </p>
+                        </div>
 
-                        <pre className="whitespace-pre-wrap">
+                        <pre className="text-justify whitespace-pre-wrap pe-3">
                             {note?.body || "-"}
                         </pre>
                     </div>
                     <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
                         <span className="flex items-start justify-center gap-2 ml-2">
-                            <AnonymousAvatar className="w-6 h-6" />
                             {note?.user !== null
                                 ? note?.user?.name || "-"
                                 : "Anonymous"}
@@ -171,13 +173,14 @@ export default function Note({ auth }) {
                 {isFetchingData ? (
                     <NoteSkeleton count={2} />
                 ) : (
-                  hasNextPage &&
-                    <PrimaryButton
-                        className={`w-full`}
-                        onClick={() => fetchNotes(currentPage)}
-                    >
-                        <div className="w-full text-center">Load More</div>
-                    </PrimaryButton>
+                    hasNextPage && (
+                        <PrimaryButton
+                            className={`w-full`}
+                            onClick={() => fetchNotes(currentPage)}
+                        >
+                            <div className="w-full text-center">Load More</div>
+                        </PrimaryButton>
+                    )
                 )}
             </div>
 

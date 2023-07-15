@@ -11,6 +11,7 @@ import _renderIcons from "@/Components/Icons/IconRenderer";
 import { HelperContext } from "@/Provider/Helper/HelperProvider";
 
 export default function Note({ auth }) {
+    console.log(auth);
     // Main State
     const [notes, setNotes] = useState([]);
     // Pagination State
@@ -23,30 +24,62 @@ export default function Note({ auth }) {
     // Contexts
     const axiosInstance = useContext(AxiosContext);
     const { isUserOnMobile } = useContext(HelperContext);
+    const toast = useContext(ToastContext);
 
     useEffect(() => {
         fetchNotes(currentPage);
     }, []);
 
-    async function fetchNotes(currentPage) {
+    async function fetchNotes(
+        currentPage,
+        keepPage = false,
+        replaceAll = false
+    ) {
         setIsFetchingData(true);
+
+        if (!keepPage) setCurrentPage(currentPage + 1);
 
         const response = await axiosInstance
             .get(
                 route("notes.public.paginate", {
-                    currentPage: currentPage,
+                    currentPage: keepPage ? currentPage - 1 : currentPage,
                 })
             )
-            .catch((error) => {
-                return;
-            })
             .finally(() => {
                 setIsFetchingData(false);
             });
 
-        setHasNextPage(response?.data?.hasNextPage);
-        setCurrentPage(currentPage + 1);
+        if (replaceAll) return setNotes(response?.data?.data);
         setNotes((prev) => [...prev, ...response?.data?.data]);
+    }
+
+    async function handleDeleteNote(id) {
+        const response = await axiosInstance.delete(
+            route("notes.delete", {
+                id: id,
+            })
+        );
+
+        toast.success(response?.data?.message);
+        fetchNotes(currentPage, true, true);
+    }
+
+    function _renderDeleteButton(note, user) {
+        let canDelete = false;
+
+        if(user === null) return;
+        if (user?.id === note?.user?.id || user?.is_super_admin === 1)
+            canDelete = true;
+
+        if (canDelete)
+            return (
+                <div
+                    className="w-6 h-6 mt-2 ml-auto cursor-pointer"
+                    onClick={() => handleDeleteNote(note?.id)}
+                >
+                    {_renderIcons("delete")}
+                </div>
+            );
     }
 
     function _renderNotes() {
@@ -57,11 +90,14 @@ export default function Note({ auth }) {
             >
                 <div className="flex justify-between gap-2">
                     <div>
-                        <p className="mb-1 font-bold underline decoration-solid">
-                            {note?.title}
-                        </p>
+                        <div className="flex gap-2 mb-2">
+                            <AnonymousAvatar className="w-6 h-6" />
+                            <p className="mb-1 font-bold underline decoration-solid">
+                                {note?.title}
+                            </p>
+                        </div>
 
-                        <pre className="break-all whitespace-pre-wrap">
+                        <pre className="text-justify whitespace-pre-wrap pe-3">
                             {note?.body || "-"}
                         </pre>
                     </div>
@@ -70,19 +106,17 @@ export default function Note({ auth }) {
                             {note?.visibility} Note
                         </p>
                         <span className="flex items-start justify-center gap-2 ml-2">
-                            <AnonymousAvatar className="w-7 h-7" />
-
                             {note?.user !== null
                                 ? note?.user?.name || "-"
                                 : "Anonymous"}
                         </span>
-
                         <div className="my-2 border-b-2 border-blue-400" />
-
                         <div>
                             {format(new Date(note?.created_at), "dd MMMM yyyy")}
                         </div>
                         <div>{format(new Date(note?.created_at), "HH:mm")}</div>
+
+                        {_renderDeleteButton(note, auth?.user)}
                     </div>
                 </div>
             </div>

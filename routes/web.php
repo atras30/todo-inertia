@@ -44,7 +44,7 @@ Route::prefix("notes")->group(function() {
     Route::post('/', [NoteController::class, 'create'])->name('notes.create');
 
     // Delete
-    Route::delete('/{id}', [NoteController::class, 'delete'])->name('notes.delete');
+    Route::delete('/{id}', [NoteController::class, 'delete'])->middleware(['auth', 'verified'])->name('notes.delete');
 
 });
 

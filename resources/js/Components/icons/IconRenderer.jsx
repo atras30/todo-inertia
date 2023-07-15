@@ -175,6 +175,81 @@ export default function _renderIcons(iconName = "") {
                     </g>
                 </svg>
             );
+        case "user-icon":
+            return (
+                <svg
+                    className="w-full h-full icon icon-tabler icon-tabler-user-circle"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.3"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                    <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+                    <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
+                </svg>
+            );
+        case "delete":
+            return (
+                <svg
+                    className="w-full h-full"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="#ff1414"
+                >
+                    <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                    <g
+                        id="SVGRepo_tracerCarrier"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                        {" "}
+                        <path
+                            d="M10 12V17"
+                            stroke="#ff0000"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        ></path>{" "}
+                        <path
+                            d="M14 12V17"
+                            stroke="#ff0000"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        ></path>{" "}
+                        <path
+                            d="M4 7H20"
+                            stroke="#ff0000"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        ></path>{" "}
+                        <path
+                            d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10"
+                            stroke="#ff0000"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        ></path>{" "}
+                        <path
+                            d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
+                            stroke="#ff0000"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        ></path>{" "}
+                    </g>
+                </svg>
+            );
         default:
             return <div className="leading-none rounded bg-slate-500">-</div>;
     }
