@@ -1,3 +1,59 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Purples */
+.purple-100 {
+    background-color: #a09cdd;
+}
+.purple-200 {
+    background-color: #9591d1;
+}
+.purple-300 {
+    background-color: #807bba;
+}
+.purple-400 {
+    background-color: #7671af;
+}
+.purple-500 {
+    background-color: #6863a0;
+}
+.purple-600 {
+    background-color: #59548f;
+}
+.purple-700 {
+    background-color: #514b86;
+}
+.purple-800 {
+    background-color: #453f79;
+}
+
+/* Purple Variants */
+.purple-lavender {
+    background-color: #ae88bd;
+}
+.purple-perano {
+    background-color: #a8b8f4;
+}
+.purple-trendy {
+    background-color: #855995;
+}
+.purple-card {
+    background-color: #eae8ff;
+}
+
+.pink-100 {
+    background-color: #ffc9c9;
+}
+.pink-200 {
+    background-color: #e9a6c2;
+}
+.pink-300 {
+    background-color: #da84a4;
+}
+.pink-400 {
+    background-color: #dc7da1;
+}
+.pink-500 {
+    background-color: #812645;
+}

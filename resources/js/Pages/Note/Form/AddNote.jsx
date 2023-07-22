@@ -47,7 +47,7 @@ export default function Dashboard({ auth }) {
         return (
             <div className="flex justify-between">
                 <div className="flex items-center justify-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800 align-middle">
+                    <h2 className="text-xl font-semibold leading-tight text-white align-middle">
                         Create New Note
                     </h2>
                 </div>
@@ -68,7 +68,7 @@ export default function Dashboard({ auth }) {
                             id="title"
                             name="title"
                             value={data.title}
-                            className="block w-full mt-1"
+                            className="block w-full mt-1 bg-slate-100"
                             isFocused={true}
                             onChange={(e) => setData("title", e.target.value)}
                         />
@@ -86,7 +86,7 @@ export default function Dashboard({ auth }) {
                         <textarea
                             id="body"
                             rows={5}
-                            className="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="w-full mt-1 border-gray-300 rounded-md shadow-sm bg-slate-100 focus:border-indigo-500 focus:ring-indigo-500"
                             name="body"
                             value={data.body}
                             onChange={(e) => setData("body", e.target.value)}

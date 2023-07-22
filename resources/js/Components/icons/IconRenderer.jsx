@@ -8,14 +8,12 @@ export default function _renderIcons(iconName = "") {
                     className="w-full h-full"
                     version="1.0"
                     xmlns="http://www.w3.org/2000/svg"
-                    width="512.000000pt"
-                    height="512.000000pt"
-                    viewBox="0 0 512.000000 512.000000"
+                    viewBox="0 0 600 600"
                     preserveAspectRatio="xMidYMid meet"
                 >
                     <g
-                        transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                        fill="#000000"
+                        transform="translate(0.000000,550) scale(0.100000,-0.100000)"
+                        fill="#fff"
                         stroke="none"
                     >
                         <path
@@ -58,7 +56,7 @@ export default function _renderIcons(iconName = "") {
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
-                    strokeWidth="2"
+                    strokeWidth="1.4"
                     stroke="currentColor"
                     fill="none"
                     strokeLinecap="round"
@@ -79,8 +77,8 @@ export default function _renderIcons(iconName = "") {
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    stroke="#fff"
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -183,11 +181,11 @@ export default function _renderIcons(iconName = "") {
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
-                    strokeWidth="1.7"
-                    stroke="currentColor"
+                    strokeWidth="1.3"
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    stroke="#fff"
                 >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                     <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>

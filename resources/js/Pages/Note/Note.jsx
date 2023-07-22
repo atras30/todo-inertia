@@ -86,13 +86,16 @@ export default function Note({ auth }) {
     }
 
     function _renderNotes() {
+        if (notes?.length === 0 && !isFetchingData)
+            return <div className="text-center">No Record Found.</div>;
+
         return notes?.map((note) => {
             if (isUserOnMobile) {
                 return (
                     // Note Container
                     <div
                         key={note?.id}
-                        className="p-5 overflow-hidden bg-white border rounded-lg shadow"
+                        className="p-5 overflow-hidden border rounded-lg shadow purple-card"
                     >
                         {/* Note Header */}
                         <div className="flex items-center gap-2 mb-1">
@@ -153,10 +156,10 @@ export default function Note({ auth }) {
             return (
                 <div
                     key={note?.id}
-                    className="p-5 overflow-hidden bg-white border rounded-lg shadow"
+                    className="p-5 overflow-hidden border rounded-lg shadow purple-card"
                 >
                     <div className="flex justify-between gap-2">
-                        <div style={{maxWidth: "85%"}}>
+                        <div style={{ maxWidth: "85%" }}>
                             <div className="flex gap-2 mb-2">
                                 <AnonymousAvatar className="w-9 h-9" />
                                 <p className="mb-1 font-bold underline decoration-solid">
@@ -202,7 +205,7 @@ export default function Note({ auth }) {
         return (
             <div className="flex justify-between">
                 <div className="flex items-center justify-between ">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800 align-middle">
+                    <h2 className="text-xl font-semibold leading-tight text-white align-middle">
                         Public Notes
                     </h2>
                 </div>
@@ -234,7 +237,7 @@ export default function Note({ auth }) {
 
                 {/* Is fetching data ? show loading. else, show button */}
                 {isFetchingData ? (
-                    <NoteSkeleton count={2} />
+                    <NoteSkeleton count={5} />
                 ) : (
                     hasNextPage && (
                         <PrimaryButton

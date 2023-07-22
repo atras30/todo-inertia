@@ -2,16 +2,16 @@ import ButtonWithRippleEffect from "@/Components/Common/Buttons/ButtonWithRipple
 import NavigationBar from "@/Components/Common/NavigationBar/NavigationBar";
 import { useWindowSize } from "@uidotdev/usehooks";
 
-export default function MasterLayout({ user, header, children, className }) {
+export default function MasterLayout({ user, header, children, className, backgroundClassName = "purple-100" }) {
     const size = useWindowSize();
     const isUserOnMobile = size.width < 640;
 
     return (
-        <div id="master-layout" className="relative min-h-screen bg-gray-100">
+        <div id="master-layout" className={`relative min-h-screen bg-gray-100 ${backgroundClassName}`}>
             <NavigationBar user={user} />
 
             {header && (
-                <header className="bg-white shadow">
+                <header className="shadow purple-500">
                     <div className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
                         {header}
                     </div>

@@ -36,10 +36,10 @@ export default function Login({ auth, status, canResetPassword }) {
                 </div>
             )}
 
-            <div className="max-w-lg p-4 ml-auto bg-white rounded shadow-md me-auto">
+            <div className="max-w-lg p-4 ml-auto rounded shadow-lg purple-card me-auto">
                 <div className="text-2xl font-bold text-center">Login</div>
-                <div className="my-3 border-b-2 border-gray-200 horizontal-line" />
-                <form onSubmit={submit} className="shadow-sm">
+                <div className="my-3 border-b-2 border-gray-400 horizontal-line" />
+                <form onSubmit={submit}>
                     <div>
                         <InputLabel htmlFor="email" value="Email" />
 
@@ -48,9 +48,8 @@ export default function Login({ auth, status, canResetPassword }) {
                             type="email"
                             name="email"
                             value={data.email}
-                            className="block w-full mt-1"
+                            className="block w-full mt-1 bg-slate-100"
                             autoComplete="username"
-                            isFocused={true}
                             onChange={(e) => setData("email", e.target.value)}
                         />
 
@@ -65,7 +64,7 @@ export default function Login({ auth, status, canResetPassword }) {
                             type="password"
                             name="password"
                             value={data.password}
-                            className="block w-full mt-1"
+                            className="block w-full mt-1 bg-slate-100"
                             autoComplete="current-password"
                             onChange={(e) =>
                                 setData("password", e.target.value)

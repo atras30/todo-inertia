@@ -31,7 +31,7 @@ export default function NavigationBar({ user }) {
                         <span className="inline-flex rounded-md">
                             <button
                                 type="button"
-                                className="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md hover:text-gray-700 focus:outline-none"
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-black transition duration-150 ease-in-out border border-transparent rounded-md purple-card hover:text-slate-600 focus:outline-none"
                             >
                                 {user.name}
 
@@ -71,7 +71,7 @@ export default function NavigationBar({ user }) {
     function _renderLoginButton() {
         return (
             <div className="relative ml-3">
-                <NavLink href={route("login")} className="text-white">
+                <NavLink href={route("login")} className="text-white hover:text-gray-300">
                     Login
                 </NavLink>
             </div>
@@ -143,9 +143,9 @@ export default function NavigationBar({ user }) {
                 >
                     <Link
                         href={route("notes.public")}
-                        className="w-full text-sm font-bold grow text-slate-600"
+                        className="w-full text-sm font-bold grow"
                     >
-                        <div className="w-6 h-6 mx-auto mb-2">
+                        <div className="w-6 h-6 mx-auto mb-1">
                             {_renderIcons("notes")}
                         </div>
                         <p>Public Notes</p>
@@ -158,9 +158,9 @@ export default function NavigationBar({ user }) {
                 >
                     <Link
                         href={route("notes.my")}
-                        className="w-full text-sm font-bold grow text-slate-600"
+                        className="w-full text-sm font-bold grow"
                     >
-                        <div className="w-6 h-6 mx-auto mb-2">
+                        <div className="w-6 h-6 mx-auto mb-1">
                             {_renderIcons("notes-2")}
                         </div>
                         <p>My Notes</p>
@@ -170,14 +170,14 @@ export default function NavigationBar({ user }) {
                 {/* Authentication */}
                 {user ? (
                     <ButtonWithRippleEffect
-                        className={"flex items-center justify-center grow text-slate-600"}
+                        className={"flex items-center justify-center grow"}
                         onClick={() =>
                             setShowAuthenticationDropdownOptions(
                                 (prev) => !prev
                             )
                         }
                     >
-                        <div className="w-6 h-6 mx-auto mb-2">
+                        <div className="w-6 h-6 mx-auto mb-1">
                             {_renderIcons("user-icon")}
                         </div>
                         <p>{user.name}</p>
@@ -191,10 +191,10 @@ export default function NavigationBar({ user }) {
                             )
                         }
                     >
-                        <div className="w-6 h-6 mx-auto mb-2">
+                        <div className="w-6 h-6 mx-auto mb-1">
                             {_renderIcons("key")}
                         </div>
-                        <p>Authentication</p>
+                        <p className="text-white">Authentication</p>
                     </ButtonWithRippleEffect>
                 )}
             </div>
@@ -228,7 +228,7 @@ export default function NavigationBar({ user }) {
 
                 <div
                     id="bottom-navigation-bar-section"
-                    className="relative shadow bg-slate-200"
+                    className="relative text-white shadow purple-500"
                 >
                     {/* Authentication Dropdown Content */}
                     {showAuthenticationDropdownOptions &&
@@ -242,7 +242,7 @@ export default function NavigationBar({ user }) {
     }
 
     return (
-        <nav className="bg-[#cf5260] border-b border-gray-100">
+        <nav className="border-b border-gray-100 purple-800">
             <div className="pe-6">
                 <div className="flex justify-between h-16">
                     <div className="flex">
@@ -261,14 +261,14 @@ export default function NavigationBar({ user }) {
                             <NavLink
                                 href={route("notes.public")}
                                 active={route().current("notes.public")}
-                                className="text-white focus:text-gray-200"
+                                className="text-white focus:text-gray-200 hover:text-gray-300"
                             >
                                 Notes
                             </NavLink>
                             <NavLink
                                 href={route("notes.my")}
                                 active={route().current("notes.my")}
-                                className="text-white focus:text-gray-200"
+                                className="text-white focus:text-gray-200 hover:text-gray-300"
                             >
                                 My Notes
                             </NavLink>
