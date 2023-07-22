@@ -183,7 +183,7 @@ export default function _renderIcons(iconName = "") {
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
-                    strokeWidth="1.3"
+                    strokeWidth="1.7"
                     stroke="currentColor"
                     fill="none"
                     strokeLinecap="round"
@@ -248,6 +248,40 @@ export default function _renderIcons(iconName = "") {
                             strokeLinejoin="round"
                         ></path>{" "}
                     </g>
+                </svg>
+            );
+        case "visibility":
+            return (
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-full h-full icon icon-tabler icon-tabler-eye"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                </svg>
+            );
+        case "note":
+            return (
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-full h-full icon icon-tabler icon-tabler-note"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M13 20l7 -7"></path>
+                    <path d="M13 20v-6a1 1 0 0 1 1 -1h6v-7a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7"></path>
                 </svg>
             );
         default:

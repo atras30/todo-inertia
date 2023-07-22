@@ -4,9 +4,7 @@ export default function AnonymousAvatar(props) {
             {...props}
             version="1.0"
             xmlns="http://www.w3.org/2000/svg"
-            width="225.000000pt"
-            height="225.000000pt"
-            viewBox="0 0 225.000000 225.000000"
+            viewBox="0 0 225 225"
             preserveAspectRatio="xMidYMid meet"
         >
             <g

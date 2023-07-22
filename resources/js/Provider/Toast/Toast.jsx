@@ -17,7 +17,7 @@ export default function Toast({
     return (
         <div
             id="toast-simple"
-            className={`shadow-md border-2 border-slate-200 flex items-center w-full p-4 space-x-2 text-gray-500 bg-white divide-gray-200 rounded-lg dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800`}
+            className={`shadow-md border-2 border-slate-200 flex items-center w-[90%] mx-auto p-4 space-x-2 text-gray-500 bg-white divide-gray-200 rounded-lg dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800`}
             style={masterStyle.backgroundColor}
             role="alert"
         >

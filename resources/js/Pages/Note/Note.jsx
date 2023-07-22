@@ -67,14 +67,17 @@ export default function Note({ auth }) {
     function _renderDeleteButton(note, user) {
         let canDelete = false;
 
-        if(user === null) return;
-        if (user?.id === note?.user?.id || user?.is_super_admin === 1)
+        if (user === null) return;
+        if (
+            parseInt(user?.id) === parseInt(note?.user?.id) ||
+            parseInt(user?.is_super_admin) === 1
+        )
             canDelete = true;
 
         if (canDelete)
             return (
                 <div
-                    className="w-6 h-6 mt-2 ml-auto cursor-pointer"
+                    className="w-6 h-6 cursor-pointer"
                     onClick={() => handleDeleteNote(note?.id)}
                 >
                     {_renderIcons("delete")}
@@ -83,44 +86,116 @@ export default function Note({ auth }) {
     }
 
     function _renderNotes() {
-        return notes?.map((note) => (
-            <div
-                key={note?.id}
-                className="p-5 overflow-hidden bg-white border rounded-lg shadow"
-            >
-                <div className="flex justify-between gap-2">
-                    <div>
-                        <div className="flex gap-2 mb-2">
-                            <AnonymousAvatar className="w-6 h-6" />
-                            <p className="mb-1 font-bold underline decoration-solid">
-                                {note?.title}
-                            </p>
-                        </div>
+        return notes?.map((note) => {
+            if (isUserOnMobile) {
+                return (
+                    // Note Container
+                    <div
+                        key={note?.id}
+                        className="p-5 overflow-hidden bg-white border rounded-lg shadow"
+                    >
+                        {/* Note Header */}
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="h-9 icon-container">
+                                <AnonymousAvatar className={" h-full"} />
+                            </div>
 
-                        <pre className="text-justify whitespace-pre-wrap pe-3">
-                            {note?.body || "-"}
-                        </pre>
-                    </div>
-                    <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
-                        <p className="mb-2 text-xs font-bold underline text-slate-500">
-                            {note?.visibility} Note
+                            <div className="grow">
+                                <p className="font-bold leading-4 decoration-solid">
+                                    {note?.title || "-"}
+                                </p>
+
+                                <div className="flex justify-end gap-1">
+                                    <div className="w-4">
+                                        {_renderIcons("visibility")}
+                                    </div>
+                                    <p className="text-xs font-bold underline text-slate-500">
+                                        {note?.visibility} Note
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-xs text-slate-500 ms-auto">
+                            {note?.user?.name || "Anonymous"}
                         </p>
-                        <span className="flex items-start justify-center gap-2 ml-2">
-                            {note?.user !== null
-                                ? note?.user?.name || "-"
-                                : "Anonymous"}
-                        </span>
-                        <div className="my-2 border-b-2 border-blue-400" />
-                        <div>
-                            {format(new Date(note?.created_at), "dd MMMM yyyy")}
-                        </div>
-                        <div>{format(new Date(note?.created_at), "HH:mm")}</div>
 
-                        {_renderDeleteButton(note, auth?.user)}
+                        {/* Note Body */}
+                        <div className="text-justify break-words whitespace-pre-wrap note-body pe-3">
+                            {note?.body || "-"}
+                        </div>
+
+                        {/* Note Footer */}
+
+                        {/* Horizontal Line */}
+                        <div className="my-2 border-b-2 border-blue-400" />
+
+                        {/* Time & Delete Button */}
+                        <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
+                            <div className="flex items-center justify-end gap-2">
+                                {/* Time Posted */}
+                                <div>
+                                    {`${format(
+                                        new Date(note?.created_at),
+                                        "dd MMMM yyyy"
+                                    )} ${format(
+                                        new Date(note?.created_at),
+                                        "HH:mm"
+                                    )}`}
+                                </div>
+
+                                {_renderDeleteButton(note, auth?.user)}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div
+                    key={note?.id}
+                    className="p-5 overflow-hidden bg-white border rounded-lg shadow"
+                >
+                    <div className="flex justify-between gap-2">
+                        <div style={{maxWidth: "85%"}}>
+                            <div className="flex gap-2 mb-2">
+                                <AnonymousAvatar className="w-9 h-9" />
+                                <p className="mb-1 font-bold underline decoration-solid">
+                                    {note?.title}
+                                </p>
+                            </div>
+
+                            <div className="text-justify break-words whitespace-pre-wrap pe-3">
+                                {note?.body || "-"}
+                            </div>
+                        </div>
+                        <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
+                            <p className="mb-2 text-xs font-bold underline text-slate-500">
+                                {note?.visibility} Note
+                            </p>
+                            <span className="flex items-start justify-center gap-2 ml-2">
+                                {note?.user !== null
+                                    ? note?.user?.name || "-"
+                                    : "Anonymous"}
+                            </span>
+                            <div className="my-2 border-b-2 border-blue-400" />
+                            <div>
+                                {format(
+                                    new Date(note?.created_at),
+                                    "dd MMMM yyyy"
+                                )}
+                            </div>
+                            <div>
+                                {format(new Date(note?.created_at), "HH:mm")}
+                            </div>
+
+                            <div className="flex justify-end mt-1">
+                                {_renderDeleteButton(note, auth?.user)}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        ));
+            );
+        });
     }
 
     function Header() {

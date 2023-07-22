@@ -52,38 +52,117 @@ export default function Note({ auth }) {
         setNotes((prev) => [...prev, ...response?.data?.data]);
     }
 
+    function _renderDeleteButton(note, user) {
+        let canDelete = false;
+
+        if (user === null) return;
+        if (user?.id === note?.user?.id || user?.is_super_admin === 1)
+            canDelete = true;
+
+        if (canDelete)
+            return (
+                <div
+                    className="w-6 h-6 cursor-pointer"
+                    onClick={() => handleDeleteNote(note?.id)}
+                >
+                    {_renderIcons("delete")}
+                </div>
+            );
+    }
+
     function _renderNotes() {
-        return notes?.map((note) => (
-            <div
-                key={note?.id}
-                className="p-5 overflow-hidden bg-white border rounded-lg shadow"
-            >
-                <div className="flex justify-between">
-                    <div>
-                        <div className="flex gap-2 mb-2">
-                            <AnonymousAvatar className="w-6 h-6" />
-                            <p className="mb-1 font-bold underline decoration-solid">
-                                {note?.title}
-                            </p>
+        return notes?.map((note) => {
+            if (isUserOnMobile) {
+                return (
+                    // Note Container
+                    <div
+                        key={note?.id}
+                        className="p-5 overflow-hidden bg-white border rounded-lg shadow"
+                    >
+                        {/* Note Header */}
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="h-9 icon-container">
+                                <AnonymousAvatar className={" h-full"} />
+                            </div>
+
+                            <div className="grow">
+                                <p className="font-bold leading-4 decoration-solid">
+                                    {note?.title || "-"}
+                                </p>
+
+                                <div className="flex justify-end gap-1">
+                                    <div className="w-4">
+                                        {_renderIcons("visibility")}
+                                    </div>
+                                    <p className="text-xs font-bold underline text-slate-500">
+                                        {note?.visibility} Note
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-xs text-slate-500 ms-auto">
+                            {note?.user?.name || "Anonymous"}
+                        </p>
+
+                        {/* Note Body */}
+                        <div className="text-justify break-words whitespace-pre-wrap note-body pe-3">
+                            {note?.body || "-"}
                         </div>
 
-                        <pre className="text-justify whitespace-pre-wrap pe-3">
-                            {note?.body || "-"}
-                        </pre>
+                        {/* Note Footer */}
+
+                        {/* Horizontal Line */}
+                        <div className="my-2 border-b-2 border-blue-400" />
+
+                        {/* Time & Delete Button */}
+                        <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
+                            <div className="flex items-center justify-end gap-2">
+                                {/* Time Posted */}
+                                <div>
+                                    {`${format(
+                                        new Date(note?.created_at),
+                                        "dd MMMM yyyy"
+                                    )} ${format(
+                                        new Date(note?.created_at),
+                                        "HH:mm"
+                                    )}`}
+                                </div>
+
+                                {_renderDeleteButton(note, auth?.user)}
+                            </div>
+                        </div>
                     </div>
-                    <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
-                        <p className="mb-2 text-xs font-bold underline text-slate-500">
-                            {note?.visibility} Note
-                        </p>
-                        <span className="flex items-start justify-center gap-2 ml-2">
-                            {note?.user !== null
-                                ? note?.user?.name || "-"
-                                : "Anonymous"}
-                        </span>
+                );
+            }
 
-                        <div className="my-2 border-b-2 border-gray-300" />
+            return (
+                <div
+                    key={note?.id}
+                    className="p-5 overflow-hidden bg-white border rounded-lg shadow"
+                >
+                    <div className="flex justify-between gap-2">
+                        <div style={{ maxWidth: "85%" }}>
+                            <div className="flex gap-2 mb-2">
+                                <AnonymousAvatar className="w-9 h-9" />
+                                <p className="mb-1 font-bold underline decoration-solid">
+                                    {note?.title}
+                                </p>
+                            </div>
 
-                        <div>
+                            <div className="text-justify break-words whitespace-pre-wrap pe-3">
+                                {note?.body || "-"}
+                            </div>
+                        </div>
+                        <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
+                            <p className="mb-2 text-xs font-bold underline text-slate-500">
+                                {note?.visibility} Note
+                            </p>
+                            <span className="flex items-start justify-center gap-2 ml-2">
+                                {note?.user !== null
+                                    ? note?.user?.name || "-"
+                                    : "Anonymous"}
+                            </span>
+                            <div className="my-2 border-b-2 border-blue-400" />
                             <div>
                                 {format(
                                     new Date(note?.created_at),
@@ -93,69 +172,15 @@ export default function Note({ auth }) {
                             <div>
                                 {format(new Date(note?.created_at), "HH:mm")}
                             </div>
-                        </div>
 
-                        <div
-                            className="w-6 h-6 mt-2 ml-auto cursor-pointer"
-                            onClick={() => handleDeleteNote(note?.id)}
-                        >
-                            <svg
-                                className="w-full h-full"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                stroke="#ff1414"
-                            >
-                                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                                <g
-                                    id="SVGRepo_tracerCarrier"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                ></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    {" "}
-                                    <path
-                                        d="M10 12V17"
-                                        stroke="#ff0000"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    ></path>{" "}
-                                    <path
-                                        d="M14 12V17"
-                                        stroke="#ff0000"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    ></path>{" "}
-                                    <path
-                                        d="M4 7H20"
-                                        stroke="#ff0000"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    ></path>{" "}
-                                    <path
-                                        d="M6 10V18C6 19.6569 7.34315 21 9 21H15C16.6569 21 18 19.6569 18 18V10"
-                                        stroke="#ff0000"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    ></path>{" "}
-                                    <path
-                                        d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
-                                        stroke="#ff0000"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    ></path>{" "}
-                                </g>
-                            </svg>
+                            <div className="flex justify-end mt-1">
+                                {_renderDeleteButton(note, auth?.user)}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        ));
+            );
+        });
     }
 
     async function handleDeleteNote(id) {
