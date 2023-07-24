@@ -9,9 +9,9 @@ import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 import MasterLayout from "@/Layouts/MasterLayout";
 import _renderIcons from "@/Components/Icons/IconRenderer";
 import { HelperContext } from "@/Provider/Helper/HelperProvider";
+import TextInput from "@/Components/TextInput";
 
 export default function Note({ auth }) {
-    console.log(auth);
     // Main State
     const [notes, setNotes] = useState([]);
     // Pagination State
@@ -20,11 +20,16 @@ export default function Note({ auth }) {
     const [isFetchingData, setIsFetchingData] = useState(false);
     // Misc State
     const [hasNextPage, setHasNextPage] = useState(false);
+    const [search, setSearch] = useState("");
 
     // Contexts
     const axiosInstance = useContext(AxiosContext);
     const { isUserOnMobile } = useContext(HelperContext);
     const toast = useContext(ToastContext);
+
+    useEffect(() => {
+        console.log(hasNextPage);
+    }, [hasNextPage]);
 
     useEffect(() => {
         fetchNotes(currentPage);
@@ -33,7 +38,8 @@ export default function Note({ auth }) {
     async function fetchNotes(
         currentPage,
         keepPage = false,
-        replaceAll = false
+        replaceAll = false,
+        search = ""
     ) {
         setIsFetchingData(true);
 
@@ -43,14 +49,23 @@ export default function Note({ auth }) {
             .get(
                 route("notes.public.paginate", {
                     currentPage: keepPage ? currentPage - 1 : currentPage,
+                    search: search,
                 })
             )
             .finally(() => {
                 setIsFetchingData(false);
             });
 
-        if (replaceAll) return setNotes(response?.data?.data);
-        setNotes((prev) => [...prev, ...response?.data?.data]);
+        // Check next page
+        setHasNextPage(response?.data?.hasNextPage || false);
+
+        if (replaceAll) {
+            setNotes(response?.data?.data);
+            setCurrentPage(1);
+            return;
+        }
+
+        return setNotes((prev) => [...prev, ...response?.data?.data]);
     }
 
     async function handleDeleteNote(id) {
@@ -224,14 +239,42 @@ export default function Note({ auth }) {
         );
     }
 
+    function handleSearch(e) {
+        e?.preventDefault();
+        fetchNotes(1, false, true, search);
+    }
+
     return (
         <MasterLayout
             className={"p-2 max-w-6xl mx-auto"}
             user={auth?.user}
             header={<Header />}
         >
+            {/* Set Browser's Title */}
             <Head title="Notes" />
 
+            {/* Search Form */}
+            <form
+                className="flex justify-between gap-2 mb-2"
+                onSubmit={handleSearch}
+            >
+                <TextInput
+                    id="search"
+                    name="search"
+                    value={search}
+                    className="block w-full bg-slate-100"
+                    placeholder="Search Something..."
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <PrimaryButton
+                    onClick={handleSearch}
+                    className="purple-card focus:bg-purple-300 active:bg-purple-300 hover:bg-purple-300"
+                >
+                    <span className="text-black">Search</span>
+                </PrimaryButton>
+            </form>
+
+            {/* Notes Container */}
             <div className="space-y-2">
                 {_renderNotes()}
 
@@ -242,7 +285,9 @@ export default function Note({ auth }) {
                     hasNextPage && (
                         <PrimaryButton
                             className={`w-full`}
-                            onClick={() => fetchNotes(currentPage)}
+                            onClick={() =>
+                                fetchNotes(currentPage, false, false, search)
+                            }
                         >
                             <div className="w-full text-center">Load More</div>
                         </PrimaryButton>

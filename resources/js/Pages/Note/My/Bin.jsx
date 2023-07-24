@@ -2,13 +2,14 @@ import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
 import AnonymousAvatar from "@/Components/Icons/AnonymousAvatar";
 import MasterLayout from "@/Layouts/MasterLayout";
-import axiosInstance, { AxiosContext } from "@/Provider/Axios/AxiosProvider";
-import { Head, Link } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import { format } from "date-fns";
-import { Fragment, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import _renderIcons from "@/Components/icons/IconRenderer";
 import { ToastContext } from "@/Provider/Toast/ToastProvider";
 import { HelperContext } from "@/Provider/Helper/HelperProvider";
+import TextInput from "@/Components/TextInput";
+import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 
 export default function Note({ auth }) {
     // Main State
@@ -20,6 +21,7 @@ export default function Note({ auth }) {
     // Misc
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [hasNextPage, setHasNextPage] = useState(false);
+    const [search, setSearch] = useState("");
 
     // Context
     const axiosInstance = useContext(AxiosContext);
@@ -43,6 +45,7 @@ export default function Note({ auth }) {
             .get(
                 route("notes.my.bin.paginate", {
                     currentPage: keepPage ? currentPage - 1 : currentPage,
+                    search: search
                 })
             )
             .finally(() => {
@@ -55,8 +58,13 @@ export default function Note({ auth }) {
         setHasNextPage(response?.data?.hasNextPage || false);
 
         // set new note list
-        if (replaceAll) return setNotes(response?.data?.data);
-        setNotes((prev) => [...prev, ...response?.data?.data]);
+        if (replaceAll) {
+            setNotes(response?.data?.data);
+            setCurrentPage(1);
+            return;
+        }
+
+        return setNotes((prev) => [...prev, ...response?.data?.data]);
     }
 
     async function handleRestore(id) {
@@ -239,6 +247,11 @@ export default function Note({ auth }) {
         );
     }
 
+    function handleSearch(e) {
+        e?.preventDefault();
+        fetchNotes(1, false, true, search);
+    }
+
     return (
         <MasterLayout
             className={"p-2 max-w-6xl mx-auto"}
@@ -246,6 +259,27 @@ export default function Note({ auth }) {
             header={<Header />}
         >
             <Head title="Notes" />
+
+            {/* Search Form */}
+            <form
+                className="flex justify-between gap-2 mb-2"
+                onSubmit={handleSearch}
+            >
+                <TextInput
+                    id="search"
+                    name="search"
+                    value={search}
+                    className="block w-full bg-slate-100"
+                    placeholder="Search Something..."
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <PrimaryButton
+                    onClick={handleSearch}
+                    className="purple-card focus:bg-purple-300 active:bg-purple-300 hover:bg-purple-300"
+                >
+                    <span className="text-black">Search</span>
+                </PrimaryButton>
+            </form>
 
             <div className="space-y-2">
                 {_renderNotes()}

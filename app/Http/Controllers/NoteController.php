@@ -112,7 +112,7 @@ class NoteController extends Controller
 
         // Define the query and filter
         $notesQuery = Note::where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
-
+        if(!empty($request->search)) $notesQuery->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
         // Set offset and limit
@@ -141,7 +141,7 @@ class NoteController extends Controller
 
         // Define the query and filter
         $notesQuery = Note::onlyTrashed()->where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('deleted_at', 'desc');
-
+        if(!empty($request->search)) $notesQuery->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
         // Set offset and limit
@@ -169,6 +169,7 @@ class NoteController extends Controller
         $paginationLimit = 20;
         // Define the query and filter
         $notesQuery = Note::where("visibility", "public")->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
+        if(!empty($request->search)) $notesQuery->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
         // Set offset and limit
