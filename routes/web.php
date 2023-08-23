@@ -30,6 +30,7 @@ Route::prefix("notes")->group(function() {
     Route::get('/', [NoteController::class, 'showPublicNotes'])->name('notes.public');
     Route::get('/public/paginate', [NoteController::class, 'paginatePublicNotes'])->name('notes.public.paginate');
     Route::get('/form', [NoteController::class, 'showCreateNoteForm'])->name('notes.form');
+    Route::get('/form/{id}', [NoteController::class, 'showEditNoteForm'])->middleware(['auth', 'verified']);
 
     // My
     Route::get('/my', [NoteController::class, 'myNotes'])->middleware(['auth', 'verified'])->name('notes.my');
@@ -42,6 +43,7 @@ Route::prefix("notes")->group(function() {
 
     // Create
     Route::post('/', [NoteController::class, 'create'])->name('notes.create');
+    Route::put('/', [NoteController::class, 'edit'])->name('notes.edit');
 
     // Delete
     Route::delete('/{id}', [NoteController::class, 'delete'])->middleware(['auth', 'verified'])->name('notes.delete');

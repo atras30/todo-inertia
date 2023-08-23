@@ -10,14 +10,7 @@ import { router } from "@inertiajs/react";
 import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 import MasterLayout from "@/Layouts/MasterLayout";
 
-export default function Dashboard({ auth }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: "",
-        body: "",
-        visibility: "public",
-        user_id: auth?.user?.id ?? null,
-    });
-
+export default function Dashboard({ auth, note }) {
     const toast = useContext(ToastContext);
     const axiosInstance = useContext(AxiosContext);
 
@@ -30,6 +23,13 @@ export default function Dashboard({ auth }) {
     let visibilityList = visibilityAnonymousList;
     if (auth.user !== null) visibilityList = visibilityAuthenticatedUserList;
 
+    const { data, setData, post, processing, errors, reset } = useForm({
+        title: note ? note?.title : "",
+        body: note ? note?.body : "",
+        visibility: note ? note?.visibility : visibilityList[0].value,
+        user_id: auth?.user?.id ?? null,
+    });
+
     useEffect(() => {
         // Do Something
     }, []);
@@ -37,6 +37,16 @@ export default function Dashboard({ auth }) {
     const submit = async (e) => {
         e.preventDefault();
 
+        //edit ? handle edit
+        if(note) {
+            const response = await axiosInstance.put(route("notes.edit"), {...data, id: note.id});
+
+            toast.success(response?.data?.message);
+            router.get(route("notes.public"));
+            return;
+        }
+
+        //handle create note
         const response = await axiosInstance.post(route("notes.create"), data);
 
         toast.success(response?.data?.message);
@@ -106,7 +116,7 @@ export default function Dashboard({ auth }) {
                         <Select
                             className="basic-single"
                             classNamePrefix="select"
-                            defaultValue={visibilityList[0]}
+                            defaultValue={note ? visibilityList.find(record => record.value == note.visibility) : visibilityList[0]}
                             isSearchable={true}
                             name="visibility"
                             options={visibilityList}

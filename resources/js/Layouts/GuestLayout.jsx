@@ -1,8 +1,6 @@
 import NavigationBar from "@/Components/Common/NavigationBar/NavigationBar";
 
 export default function GuestLayout({ auth, header, children }) {
-    console.log(auth);
-
     return (
         <div className="relative min-h-screen bg-gray-100">
             <NavigationBar />

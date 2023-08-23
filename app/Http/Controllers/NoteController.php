@@ -27,6 +27,26 @@ class NoteController extends Controller
         return Inertia::render("Note/Form/AddNote");
     }
 
+    public function showEditNoteForm($id)
+    {
+        $user = auth()->user();
+        $note = Note::where("id", $id)->first();
+        if(!$note) return Inertia::render("NotFound");
+
+        //if not super user
+        if (!$user->is_super_admin) {
+            // cant edit anonymous notes
+            if (!$note->user) return Inertia::render("Unauthorized");
+            // cant edit other people's note
+            if($user->id != $note->user->id) return Inertia::render("Unauthorized");
+        }
+
+        //Return add note view
+        return Inertia::render("Note/Form/AddNote", [
+            "note" => $note
+        ]);
+    }
+
     public function showRecycleBin()
     {
         return Inertia::render("Note/My/Bin");
@@ -53,6 +73,28 @@ class NoteController extends Controller
         ], Response::HTTP_CREATED);
     }
 
+    //PUT
+    public function edit(CreateNoteRequest $request)
+    {
+        if ($request->title === null) $request['title'] = "";
+
+        try {
+            $note = Note::find($request->id);
+            $note->title = $request->title;
+            $note->body = $request->body;
+            $note->visibility = $request->visibility;
+            $note->updated_by = $request->user()->id;
+
+            $note->save();
+        } catch (\Exception $e) {
+            return response()->json($e, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            "message" => "Note has successfully been edited!"
+        ], Response::HTTP_OK);
+    }
+
     // DELETE
     public function delete(Request $request, $id)
     {
@@ -60,7 +102,7 @@ class NoteController extends Controller
             return $this->throwInternalServerError("Id must be filled.");
 
         $note = Note::where("id", $id)->firstOrFail();
-        if($note->user_id !== $request->user()->id && $request->user()->is_super_admin === 0)
+        if ($note->user_id !== $request->user()->id && $request->user()->is_super_admin === 0)
             return $this->throwInternalServerError("You can't delete other people notes");
 
         try {
@@ -111,8 +153,20 @@ class NoteController extends Controller
         $paginationLimit = 20;
 
         // Define the query and filter
-        $notesQuery = Note::where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
-        if(!empty($request->search)) $notesQuery->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
+        $notesQuery = Note::with('user:id,name')
+            ->select('id', 'title', 'body', 'created_at', "user_id", "visibility")
+            ->where("user_id", auth()->user()->id)
+            ->where(function ($query) use ($request) {
+                if (empty($request->visibilities)) return $query;
+                return $query->whereIn("visibility", $request->visibilities);
+            })
+            ->where(function ($query) use ($request) {
+                if (empty($request->search)) return $query;
+                return $query->where("title", "like", "%{$request->search}%")
+                    ->orWhere("body", "like", "%{$request->search}%");
+            })
+            ->orderBy('created_at', 'desc');
+
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
         // Set offset and limit
@@ -141,7 +195,7 @@ class NoteController extends Controller
 
         // Define the query and filter
         $notesQuery = Note::onlyTrashed()->where("user_id", auth()->user()->id)->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('deleted_at', 'desc');
-        if(!empty($request->search)) $notesQuery->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
+        if (!empty($request->search)) $notesQuery->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
         // Set offset and limit
@@ -168,8 +222,13 @@ class NoteController extends Controller
         //Define the pagination limit
         $paginationLimit = 20;
         // Define the query and filter
-        $notesQuery = Note::where("visibility", "public")->with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
-        if(!empty($request->search)) $notesQuery->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
+        $notesQuery = Note::with('user:id,name')->select('id', 'title', 'body', 'created_at', "user_id", "visibility")->orderBy('created_at', 'desc');
+
+        if (!empty($request->search)) $notesQuery = $notesQuery->where(function ($query) use ($request) {
+            $query->where("title", "like", "%{$request->search}%")->orWhere("body", "like", "%{$request->search}%");
+        });
+
+        $notesQuery = $notesQuery->where("visibility", "public");
         // Get total data of the filtered query
         $totalData = $notesQuery->count();
         // Set offset and limit

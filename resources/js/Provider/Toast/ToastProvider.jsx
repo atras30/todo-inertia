@@ -21,7 +21,6 @@ export default function ToastProvider({ children }) {
         toasts?.forEach((record) => {
             if (record.hasActiveTimeout === false) {
                 setTimeout(() => {
-                    console.log("toast vanish: ", record.id);
                     setToasts((prevToasts) =>
                         prevToasts.filter((toast) => toast.id !== record.id)
                     );

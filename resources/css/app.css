@@ -57,3 +57,10 @@
 .pink-500 {
     background-color: #812645;
 }
+
+.tag-active {
+    transition: all .3s;
+    background-color: #57b9ff;
+    color: white;
+    outline: 1px solid grey;
+}

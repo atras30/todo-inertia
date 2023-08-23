@@ -5,11 +5,12 @@ import MasterLayout from "@/Layouts/MasterLayout";
 import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
 import { Head, Link } from "@inertiajs/react";
 import { format } from "date-fns";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import _renderIcons from "@/Components/icons/IconRenderer";
 import { ToastContext } from "@/Provider/Toast/ToastProvider";
 import { HelperContext } from "@/Provider/Helper/HelperProvider";
 import TextInput from "@/Components/TextInput";
+import { router } from "@inertiajs/react";
 
 export default function Note({ auth }) {
     // Main State
@@ -21,6 +22,7 @@ export default function Note({ auth }) {
     // Misc
     const [search, setSearch] = useState("");
     const [hasNextPage, setHasNextPage] = useState(false);
+    const tagRef = useRef(null);
 
     // Context
     const axiosInstance = useContext(AxiosContext);
@@ -41,11 +43,13 @@ export default function Note({ auth }) {
 
         if (!keepPage) setCurrentPage(currentPage + 1);
 
+        const activeTags = getActiveTags();
         const response = await axiosInstance
             .get(
                 route("notes.my.paginate", {
                     currentPage: keepPage ? currentPage - 1 : currentPage,
                     search: search,
+                    visibilities: activeTags,
                 })
             )
             .finally(() => {
@@ -57,7 +61,7 @@ export default function Note({ auth }) {
 
         if (replaceAll) {
             setNotes(response?.data?.data);
-            setCurrentPage(1);
+            setCurrentPage(2);
             return;
         }
 
@@ -78,6 +82,29 @@ export default function Note({ auth }) {
                     onClick={() => handleDeleteNote(note?.id)}
                 >
                     {_renderIcons("delete")}
+                </div>
+            );
+    }
+
+    function redirectToEditNote(note) {
+        if(!note) return;
+
+        router.get(`/notes/form/${note?.id}`);
+    }
+
+    function _renderEditButton(note, user) {
+        let canEdit = false;
+
+        if (user === null) return;
+        if (user?.id === note?.user?.id || user?.is_super_admin === 1)
+            canEdit = true;
+
+        if (canEdit)
+            return (
+                <div>
+                    <button onClick={() => redirectToEditNote(note)} className="items-center px-4 py-1 mt-2 text-xs font-bold text-gray-700 uppercase transition-all rounded-md shadow-md cursor-pointer select-none bg-amber-300 active:bg-amber-400 leading-sm">
+                        Edit
+                    </button>
                 </div>
             );
     }
@@ -131,19 +158,25 @@ export default function Note({ auth }) {
 
                         {/* Time & Delete Button */}
                         <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
-                            <div className="flex items-center justify-end gap-2">
-                                {/* Time Posted */}
-                                <div>
-                                    {`${format(
-                                        new Date(note?.created_at),
-                                        "dd MMMM yyyy"
-                                    )} ${format(
-                                        new Date(note?.created_at),
-                                        "HH:mm"
-                                    )}`}
-                                </div>
+                            <div className="flex items-center justify-between gap-2">
+                                {/* Edit Button */}
+                                {_renderEditButton(note, auth?.user)}
 
-                                {_renderDeleteButton(note, auth?.user)}
+                                <div className="flex justify-end gap-2 flex-item">
+                                    {/* Time Posted */}
+                                    <div>
+                                        {`${format(
+                                            new Date(note?.created_at),
+                                            "dd MMMM yyyy"
+                                        )} ${format(
+                                            new Date(note?.created_at),
+                                            "HH:mm"
+                                        )}`}
+                                    </div>
+
+                                    {/* Delete Button */}
+                                    {_renderDeleteButton(note, auth?.user)}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -156,20 +189,28 @@ export default function Note({ auth }) {
                     className="p-5 overflow-hidden border rounded-lg shadow purple-card"
                 >
                     <div className="flex justify-between gap-2">
-                        <div style={{ maxWidth: "85%" }}>
-                            <div className="flex gap-2 mb-2">
-                                <AnonymousAvatar className="w-9 h-9" />
-                                <p className="mb-1 font-bold underline decoration-solid">
-                                    {note?.title}
-                                </p>
+                        <div
+                            className="flex flex-col justify-between"
+                            style={{ maxWidth: "85%" }}
+                        >
+                            <div className="flex-item">
+                                <div className="flex gap-2 mb-1">
+                                    <AnonymousAvatar className="w-9 h-9" />
+                                    <p className="font-bold underline decoration-solid">
+                                        {note?.title}
+                                    </p>
+                                </div>
+
+                                <div className="text-justify break-words whitespace-pre-wrap pe-3">
+                                    {note?.body || "-"}
+                                </div>
                             </div>
 
-                            <div className="text-justify break-words whitespace-pre-wrap pe-3">
-                                {note?.body || "-"}
-                            </div>
+                            {/* Edit Button */}
+                            {_renderEditButton(note, auth?.user)}
                         </div>
                         <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
-                            <p className="mb-2 text-xs font-bold underline text-slate-500">
+                            <p className="text-xs font-bold underline text-slate-500">
                                 {note?.visibility} Note
                             </p>
                             <span className="flex items-start justify-center gap-2 ml-2">
@@ -243,7 +284,23 @@ export default function Note({ auth }) {
 
     function handleSearch(e) {
         e?.preventDefault();
-        fetchNotes(0, false, true, search);
+        fetchNotes(1, false, true, search);
+    }
+
+    function handleTagClick(event) {
+        const element = event.target;
+        element.classList.toggle("tag-active");
+
+        fetchNotes(1, false, true, search);
+    }
+
+    function getActiveTags() {
+        const tagContainer = tagRef.current;
+        const currentActiveTag = tagContainer.querySelectorAll(".tag-active");
+        const activeTags = [...currentActiveTag].map((record) =>
+            record.textContent.toLowerCase()
+        );
+        return activeTags;
     }
 
     return (
@@ -275,6 +332,27 @@ export default function Note({ auth }) {
                 </PrimaryButton>
             </form>
 
+            <div className="flex items-center gap-2 tag-container" ref={tagRef}>
+                <div
+                    onClick={handleTagClick}
+                    className="inline-flex items-center px-3 py-1 mb-2 text-xs font-bold text-gray-700 uppercase bg-white rounded-md shadow-md cursor-pointer select-none leading-sm"
+                >
+                    Public
+                </div>
+                <div
+                    onClick={handleTagClick}
+                    className="inline-flex items-center px-3 py-1 mb-2 text-xs font-bold text-gray-700 uppercase bg-white rounded-md shadow-md cursor-pointer select-none leading-sm"
+                >
+                    Private
+                </div>
+                <div
+                    onClick={handleTagClick}
+                    className="inline-flex items-center px-3 py-1 mb-2 text-xs font-bold text-gray-700 uppercase bg-white rounded-md shadow-md cursor-pointer select-none leading-sm"
+                >
+                    Unlisted
+                </div>
+            </div>
+
             <div className="space-y-2">
                 {_renderNotes()}
 
@@ -285,7 +363,9 @@ export default function Note({ auth }) {
                     hasNextPage && (
                         <PrimaryButton
                             className={`w-full`}
-                            onClick={() => fetchNotes(currentPage)}
+                            onClick={() =>
+                                fetchNotes(currentPage, false, false, search)
+                            }
                         >
                             <div className="w-full text-center">Load More</div>
                         </PrimaryButton>

@@ -2,7 +2,7 @@ import NoteSkeleton from "@/Components/Loading/Skeleton/Note/NoteSkeleton";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { ToastContext } from "@/Provider/Toast/ToastProvider";
 import AnonymousAvatar from "@/Components/Icons/AnonymousAvatar";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { format } from "date-fns";
 import { useContext, useEffect, useState } from "react";
 import { AxiosContext } from "@/Provider/Axios/AxiosProvider";
@@ -26,10 +26,6 @@ export default function Note({ auth }) {
     const axiosInstance = useContext(AxiosContext);
     const { isUserOnMobile } = useContext(HelperContext);
     const toast = useContext(ToastContext);
-
-    useEffect(() => {
-        console.log(hasNextPage);
-    }, [hasNextPage]);
 
     useEffect(() => {
         fetchNotes(currentPage);
@@ -114,7 +110,7 @@ export default function Note({ auth }) {
                     >
                         {/* Note Header */}
                         <div className="flex items-center gap-2 mb-1">
-                            <div className="h-9 icon-container">
+                            <div className="mb-2 h-9 icon-container">
                                 <AnonymousAvatar className={" h-full"} />
                             </div>
 
@@ -149,19 +145,23 @@ export default function Note({ auth }) {
 
                         {/* Time & Delete Button */}
                         <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
-                            <div className="flex items-center justify-end gap-2">
-                                {/* Time Posted */}
-                                <div>
-                                    {`${format(
-                                        new Date(note?.created_at),
-                                        "dd MMMM yyyy"
-                                    )} ${format(
-                                        new Date(note?.created_at),
-                                        "HH:mm"
-                                    )}`}
-                                </div>
+                            <div className="flex items-center justify-between gap-2">
+                                {_renderEditButton(note, auth?.user)}
 
-                                {_renderDeleteButton(note, auth?.user)}
+                                <div className="flex items-center justify-end gap-2">
+                                    {/* Time Posted */}
+                                    <div>
+                                        {`${format(
+                                            new Date(note?.created_at),
+                                            "dd MMMM yyyy"
+                                        )} ${format(
+                                            new Date(note?.created_at),
+                                            "HH:mm"
+                                        )}`}
+                                    </div>
+
+                                    {_renderDeleteButton(note, auth?.user)}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -178,13 +178,15 @@ export default function Note({ auth }) {
                             <div className="flex gap-2 mb-2">
                                 <AnonymousAvatar className="w-9 h-9" />
                                 <p className="mb-1 font-bold underline decoration-solid">
-                                    {note?.title}
+                                    {note?.title || "-"}
                                 </p>
                             </div>
 
                             <div className="text-justify break-words whitespace-pre-wrap pe-3">
                                 {note?.body || "-"}
                             </div>
+
+                            {_renderEditButton(note, auth?.user)}
                         </div>
                         <div className="me-2 text-sm font-medium text-end text-slate-400 min-w-[4rem]">
                             <p className="mb-2 text-xs font-bold underline text-slate-500">
@@ -242,6 +244,32 @@ export default function Note({ auth }) {
     function handleSearch(e) {
         e?.preventDefault();
         fetchNotes(1, false, true, search);
+    }
+
+    function redirectToEditNote(note) {
+        if (!note) return;
+
+        router.get(`/notes/form/${note?.id}`);
+    }
+
+    function _renderEditButton(note, user) {
+        let canEdit = false;
+
+        if (!user) return;
+        if (user?.id == note?.user?.id || user?.is_super_admin == 1)
+            canEdit = true;
+
+        if (canEdit)
+            return (
+                <div>
+                    <button
+                        onClick={() => redirectToEditNote(note)}
+                        className="items-center px-4 py-1 mt-2 text-xs font-bold text-gray-700 uppercase transition-all rounded-md shadow-md cursor-pointer select-none bg-amber-300 active:bg-amber-400 leading-sm"
+                    >
+                        Edit
+                    </button>
+                </div>
+            );
     }
 
     return (
