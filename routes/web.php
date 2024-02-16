@@ -3,9 +3,7 @@
 use App\Http\Controllers\Helper\AssetController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +18,16 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return to_route("notes.public");
+});
+
+Route::get('/cv', function () {
+    $driveCvUrl = "https://drive.google.com/file/d/1kkSyU3mFmRmpQZyYu1FGWNg6-wrFIpq7/view";
+    return redirect($driveCvUrl);
+});
+
+Route::get('/portfolio', function () {
+    $drivePortfolioUrl = "https://drive.google.com/file/d/1AvVL6DeZRMIUayg5k5RIWokCohXWeJ23/view?usp=drive_link";
+    return redirect($drivePortfolioUrl);
 });
 
 Route::get("/asset/image", [AssetController::class, 'getImageFromUrl']);
@@ -47,7 +55,6 @@ Route::prefix("notes")->group(function() {
 
     // Delete
     Route::delete('/{id}', [NoteController::class, 'delete'])->middleware(['auth', 'verified'])->name('notes.delete');
-
 });
 
 Route::middleware('auth')->group(function () {
