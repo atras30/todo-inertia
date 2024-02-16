@@ -293,10 +293,12 @@ export default function Note({ auth }) {
                     className="block w-full bg-slate-100"
                     placeholder="Search Something..."
                     onChange={(e) => setSearch(e.target.value)}
+                    tabIndex={1}
                 />
                 <PrimaryButton
                     onClick={handleSearch}
                     className="purple-card focus:bg-purple-300 active:bg-purple-300 hover:bg-purple-300"
+                    tabIndex={2}
                 >
                     <span className="text-black">Search</span>
                 </PrimaryButton>

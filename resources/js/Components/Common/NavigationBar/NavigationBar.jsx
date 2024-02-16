@@ -262,6 +262,7 @@ export default function NavigationBar({ user, navBackgroundColor, bottomNavigati
                                 href={route("notes.public")}
                                 active={route().current("notes.public")}
                                 className="text-white focus:text-gray-200 hover:text-gray-300"
+                                tabIndex={3}
                             >
                                 Notes
                             </NavLink>
@@ -269,6 +270,7 @@ export default function NavigationBar({ user, navBackgroundColor, bottomNavigati
                                 href={route("notes.my")}
                                 active={route().current("notes.my")}
                                 className="text-white focus:text-gray-200 hover:text-gray-300"
+                                tabIndex={4}
                             >
                                 My Notes
                             </NavLink>
