@@ -241,7 +241,7 @@ export default function Note({ auth }) {
         );
     }
 
-    function handleSearch(e) {
+    async function handleSearch(e) {
         e?.preventDefault();
         fetchNotes(1, false, true, search);
     }
@@ -284,7 +284,7 @@ export default function Note({ auth }) {
             {/* Search Form */}
             <form
                 className="flex justify-between gap-2 mb-2"
-                onSubmit={handleSearch}
+                onSubmit={(e) => e.preventDefault()}
             >
                 <TextInput
                     id="search"

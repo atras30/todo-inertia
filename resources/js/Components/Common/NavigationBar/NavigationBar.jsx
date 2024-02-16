@@ -8,7 +8,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import _renderIcons from "@/Components/icons/IconRenderer";
 import { HelperContext } from "@/Provider/Helper/HelperProvider";
 
-export default function NavigationBar({ user }) {
+export default function NavigationBar({ user, navBackgroundColor, bottomNavigationColor }) {
     // Main State
     const [
         showAuthenticationDropdownOptions,
@@ -228,7 +228,7 @@ export default function NavigationBar({ user }) {
 
                 <div
                     id="bottom-navigation-bar-section"
-                    className="relative text-white shadow purple-500"
+                    className={`relative text-white shadow ${bottomNavigationColor ?? "purple-500"}`}
                 >
                     {/* Authentication Dropdown Content */}
                     {showAuthenticationDropdownOptions &&
@@ -242,7 +242,7 @@ export default function NavigationBar({ user }) {
     }
 
     return (
-        <nav className="border-b border-gray-100 purple-800">
+        <nav className={`border-b border-gray-100 ${navBackgroundColor ?? "purple-800"}`}>
             <div className="pe-6">
                 <div className="flex justify-between h-16">
                     <div className="flex">

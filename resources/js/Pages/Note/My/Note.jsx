@@ -119,7 +119,7 @@ export default function Note({ auth }) {
                     // Note Container
                     <div
                         key={note?.id}
-                        className="p-5 overflow-hidden border rounded-lg shadow purple-card test"
+                        className="p-5 overflow-hidden border rounded-lg shadow bg-slate-100"
                     >
                         {/* Note Header */}
                         <div className="flex items-center gap-2 mb-1">
@@ -186,7 +186,7 @@ export default function Note({ auth }) {
             return (
                 <div
                     key={note?.id}
-                    className="p-5 overflow-hidden border rounded-lg shadow purple-card"
+                    className="p-5 overflow-hidden border rounded-lg shadow-lg bg-slate-100"
                 >
                     <div className="flex justify-between gap-2">
                         <div
@@ -308,6 +308,10 @@ export default function Note({ auth }) {
             className={"p-2 max-w-6xl mx-auto"}
             user={auth.user}
             header={<Header />}
+            navBackgroundColor={"bg-slate-800"}
+            bottomNavigationColor={"bg-slate-600"}
+            headerBackgroundColor={"bg-slate-600"}
+            backgroundClassName="bg-slate-200"
         >
             <Head title="Notes" />
 
@@ -326,9 +330,9 @@ export default function Note({ auth }) {
                 />
                 <PrimaryButton
                     onClick={handleSearch}
-                    className="purple-card focus:bg-purple-300 active:bg-purple-300 hover:bg-purple-300"
+                    className="shadow bg-slate-400 focus:bg-slate-300 active:bg-slate-300 hover:bg-slate-300"
                 >
-                    <span className="text-black">Search</span>
+                    <span className="font-bold text-black">Search</span>
                 </PrimaryButton>
             </form>
 
